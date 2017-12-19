@@ -1,0 +1,5 @@
+package: github.com/hIMEI29A/gichidan
+import:
+- package: github.com/hIMEI29A/gotorsocks
+  version: ^0.3.1
+- package: golang.org/x/net/html

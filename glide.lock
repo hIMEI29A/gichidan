@@ -1,6 +1,10 @@
 hash: f5c38589c197d19c681bec27f9a05095e89843c43afe3b0a3654c91509c32fdd
-updated: 2017-12-19T16:04:40.495012458-05:00
+updated: 2017-12-19T18:43:26.875799096-05:00
 imports:
+- name: github.com/antchfx/htmlquery
+  version: 9f7717ac9bac5f660391c57e3d496b3c7cf9741f
+- name: github.com/antchfx/xpath
+  version: 58d12fe685d684ed55aab3b988394652025e36dc
 - name: github.com/hIMEI29A/gotorsocks
   version: b1924e129c4952b72f546adfdd5addfd9ecbfd74
 - name: golang.org/x/net
@@ -8,5 +12,24 @@ imports:
   subpackages:
   - html
   - html/atom
+  - html/charset
   - proxy
+- name: golang.org/x/text
+  version: eb22672bea55af56d225d4e35405f4d2e9f062a0
+  subpackages:
+  - encoding
+  - encoding/charmap
+  - encoding/htmlindex
+  - encoding/internal
+  - encoding/internal/identifier
+  - encoding/japanese
+  - encoding/korean
+  - encoding/simplifiedchinese
+  - encoding/traditionalchinese
+  - encoding/unicode
+  - internal/tag
+  - internal/utf8internal
+  - language
+  - runes
+  - transform
 testImports: []

@@ -19,27 +19,30 @@
 package main
 
 import (
-	//"bufio"
-	"fmt"
-	//"log"
-	//"strings"
+	"log"
+	"strconv"
+	"time"
 )
 
-// Gichidan represents main app type
-type Gichidan struct {
-	Data
+// Toint converts string to int and handle errors
+func toInt(str string) int {
+	intCount, err := strconv.Atoi(str)
+	ErrFatal(err)
 
-	Parser
+	return intCount
 }
 
-func main() {
-	parser := NewParser("cards")
+// Gettime converts string to time.Time
+func getTime(timestring string) time.Time {
+	fulltime, err := time.Parse(LONGFORM, timestring)
+	ErrFatal(err)
 
-	names := parser.getH6names()
-	servfields := parser.getServiceFields(names)
-	summfields := parser.getSummaryFields()
-	page := NewPage(names, servfields, summfields)
+	return fulltime
+}
 
-	fmt.Println(page)
-
+// ErrFatal is the basic errors handler
+func ErrFatal(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -22,37 +22,44 @@ import (
 	"fmt"
 	//"strconv"
 	"time"
+
+	"golang.org/x/net/html"
 )
 
 const (
-	H6           string = "//h6"
-	CH6                 = "</h6>"
-	DIV                 = "<div>"
-	CDIV                = "</div>"
-	SPAN                = "span"
-	LESSER              = "<"
-	GREATER             = ">"
-	LINK                = "//a"
-	CLINK               = "</a>"
-	HREF                = "//a[@href]"
+	CLINK        string = "</a>"
 	PRE                 = "pre"
 	CPRE                = "</pre>"
 	SPACE               = " "
 	BACKSEP             = "</"
 	ADDED               = "Added on "
 	LONGFORM            = "2017-09-09 01:30:35 UTC"
-	TOTALR              = "Total Results"
 	COLXS12             = "\"col-xs-12\""
-	SERVICE             = "\"service\""
-	SERVICENAME         = "//div[@class='span8 name']" ////div[@id='merchant-info']/a
-	SERVICECOUNT        = "//div[@class='span4 count']"
-	SUMMARY             = "//div[@class='search-result-summary col-xs-4']"
 	ONION               = "\"onion\""
 	ONIONHREF           = "\"/onions/"
 	COLXS8              = "\"col-xs-8\""
+	SPAN                = "//span"
+	INDEXSUMMARY        = "//div[@class='indexsummary']"
+	SUMMARY             = "//div[@class='search-result-summary col-xs-4']"
+	LINK                = "//a"
+	HREF                = "//a[@href]"
 	DETAILS             = "//a[@class='details']"
 	PAGINATION          = "//div[@class='pagination']"
+	TOTALR              = "//div[@class='bignumber']"
+	SERVICE             = "//div[@class='service']"
+	SERVICES            = "//div[@class='services']"
+	SERVICENAME         = "//div[@class='span8 name']"
+	SERVICECOUNT        = "//div[@class='span4 count']"
+	TOPSERVICES         = "Top Services"
+	TOPSOFT             = "Top Software"
+	TOPSYS              = "Top Operating Systems"
 )
+
+var TOPS = []string{
+	TOPSERVICES,
+	TOPSOFT,
+	TOPSYS,
+}
 
 type Data struct {
 	Query string
@@ -60,26 +67,30 @@ type Data struct {
 }
 
 type Page struct {
-	Headers6 []*Header6
-	Summarys []*Summary
+	IndSummary *IndexSummary
+	Summarys   []*Summary
 	//Pagination string
 }
 
-type Header6 struct {
-	Name     string
-	Services []*Service
+type IndexSummary struct {
+	Totalr string
+	Servs  map[string]*Services
+}
+
+type Services struct {
+	Serv []*Service
 }
 
 type Service struct {
 	ServiceName  string
-	ServiceCount int
+	ServiceCount string
 }
 
 type Summary struct {
 	HostUrl     string
 	Date        time.Time
 	DetailsLink string
-	Pre         string
+	//Pre         string
 }
 
 // Constructors //////////////////////////////
@@ -90,96 +101,101 @@ func NewData(query string, page *Page) *Data {
 	return data
 }
 
-func NewHeader6(name string, services []*Service) *Header6 {
-	header := &Header6{name, services}
-
-	return header
-}
-
-func NewPage(h6names []string, serviceFields map[string][]string, summaryFields map[int][]string) *Page {
-	var services []*Service
+func NewPage(ind *IndexSummary, fields map[int][]string) *Page {
 	var summarys []*Summary
-	var headers []*Header6
 
-	for _, value := range serviceFields {
-		serv := NewService(value)
-		services = append(services, serv)
+	for _, value := range fields {
+		summary := NewSummary(value)
+		summarys = append(summarys, summary)
 	}
 
-	if len(h6names) == len(services) {
-		for _, name := range h6names {
-			header := NewHeader6(name, services)
-			headers = append(headers, header)
-		}
-	}
-
-	for _, value := range summaryFields {
-		summ := NewSummary(value)
-		summarys = append(summarys, summ)
-	}
-
-	page := &Page{headers, summarys /*pagination*/}
+	page := &Page{ind, summarys}
 
 	return page
 }
 
-func NewService(fields []string) *Service {
-	service := &Service{fields[0], toInt(fields[1])}
+func NewService(name string, count string) *Service {
+	service := &Service{name, count}
 
 	return service
 }
 
+func NewServices(serv []*Service) *Services {
+	services := &Services{serv}
+
+	return services
+}
+
 func NewSummary(fields []string) *Summary {
-	summary := &Summary{fields[0], getTime(fields[1]), fields[2], fields[3]}
+	summary := &Summary{fields[0], getTime(fields[1]), fields[2]}
 
 	return summary
 }
 
-// Stringer implementations for all types ///////////////////
+func NewIndSummary(totalr string, svs map[string]*html.Node) *IndexSummary {
+	var servs map[string]*Services
+	var serv []*Service
+
+	for key, svsnode := range svs {
+		servnodes := getServiceNodes(svsnode)
+
+		for _, svnode := range servnodes {
+			name := getServiceName(svnode)
+			count := getServiceCount(svnode)
+			service := NewService(name, count)
+			serv = append(serv, service)
+			s := NewServices(serv)
+
+			servs[key] = s
+		}
+	}
+
+	ind := &IndexSummary{totalr, servs}
+
+	return ind
+}
+
+// Stringer Implementations of Stringer interface for all data types ///////////////////
 
 func (d *Data) String() string {
-	return fmt.Sprintf("Query = %s\n, Page = %v\n", d.Query, d.Pages)
+	return fmt.Sprintf("Query = %s\n, Page = %+v\n", d.Query, d.Pages)
 }
 
 func (s *Summary) String() string {
-	return fmt.Sprintf("HostUrl = %s\n, Date = %s\n, DetailsLink = %s\n, Pre = %s\n",
-		s.HostUrl, s.Date.String(), s.DetailsLink, s.Pre)
+	return fmt.Sprintf("HostUrl = %s\n, Date = %s\n, DetailsLink = %s\n",
+		s.HostUrl, s.Date.String(), s.DetailsLink)
 }
 
 func (s *Service) String() string {
-	return fmt.Sprintf("ServiceName = %s\n, ServiceCount = %i\n", s.ServiceName, s.ServiceCount)
+	return fmt.Sprintf("ServiceName = %s\n, ServiceCount = %s\n", s.ServiceName, s.ServiceCount)
 }
 
-func (h *Header6) String() string {
-	var strserv string
-	serv := func(s []*Service) string {
-		for _, service := range s {
-			strserv += service.String() + ", "
-		}
+func (ss *Services) String() string {
+	var servstring string
 
-		return fmt.Sprintf("Header %s = \n %s", h.Name, strserv)
+	for _, s := range ss.Serv {
+		servstring += s.String() + ", "
 	}
 
-	return fmt.Sprintf("Name = %s\n, Services = %v\n", h.Name, serv(h.Services))
+	return fmt.Sprintf("%s\n", servstring)
+}
+
+func (i *IndexSummary) String() string {
+	var servsstring string
+
+	for key, value := range i.Servs {
+		servsstring += key + ": " + value.String() + "\n"
+	}
+
+	return fmt.Sprintf("Totalr = %s\n, Services = %s\n", i.Totalr, servsstring)
 }
 
 func (p *Page) String() string {
-	var strhead, strsumm string
-	head := func(h []*Header6) string {
-		for _, header := range h {
-			strhead += header.String() + ", "
-		}
+	var summstring string
 
-		return fmt.Sprintf("Headers = %s", strhead)
+	for _, s := range p.Summarys {
+		summstring += s.String() + "\n"
 	}
 
-	sum := func(s []*Summary) string {
-		for _, summ := range s {
-			strsumm += summ.String() + ", "
-		}
-
-		return fmt.Sprintf("Summarys = %s", strsumm)
-	}
-
-	return fmt.Sprintf("Headers6 = %v\n, Summarys = %v\n", head(p.Headers6), sum(p.Summarys))
+	return fmt.Sprintf("IndSumm = %+v\n, Summ = %s\n", p.IndSummary, p.Summarys)
 }

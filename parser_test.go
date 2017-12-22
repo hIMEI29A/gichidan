@@ -15,34 +15,3 @@
 // @Author: hIMEI
 // @Date:   2017-12-17 21:29:46
 /////////////////////////////////////////////////////////////////////////
-
-package main
-
-import (
-	//"bufio"
-	"fmt"
-	//"log"
-	//"strings"
-)
-
-// Gichidan represents main app type
-type Gichidan struct {
-	Data
-
-	Parser
-}
-
-func main() {
-	parser := NewParser("paypal")
-
-	services := parser.getServicesNodes()
-	//service := getServiceNodes(services)
-	totalr := parser.getTotalr()
-	summfields := parser.getSummaryFields()
-	ind := NewIndSummary(totalr, services)
-	//summary := NewSummary(summfields)
-	page := NewPage(ind, summfields)
-
-	fmt.Println(page)
-
-}

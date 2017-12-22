@@ -24,6 +24,7 @@ import (
 	//"strconv"
 	//"strings"
 	"bufio"
+	"errors"
 	//"time"
 
 	"github.com/antchfx/htmlquery"
@@ -79,44 +80,52 @@ func findEntrys(node *html.Node, entryexp string) []*html.Node {
 	return htmlquery.Find(node, entryexp)
 }
 
-/*
-func createExp(entryname, attrname, attrvalue string) string {
-	switch entryname {
-	case entryname == "div":
-
-	}
-}
-*/
-
-func (p *Parser) getH6names() []string {
-	var tags []string
-	nodes := findEntrys(p.Root, H6)
-
-	for _, newtag := range nodes {
-		text := htmlquery.InnerText(newtag)
-		tags = append(tags, text)
-	}
-
-	return tags
+func getTag(node *html.Node, tagexp string) string {
+	return htmlquery.InnerText(findEntry(node, tagexp))
 }
 
-func (p *Parser) getServiceFields(h6names []string) map[string][]string {
-	nodes := findEntrys(p.Root, H6)
-	fields := make(map[string][]string)
-	var body []string
+func (p *Parser) getTotalr() int {
+	return toInt(getTag(p.Root, TOTALR))
+}
 
-	for i, newtag := range nodes {
-		fmt.Println(newtag)
-		fname := h6names[i]
-		//fmt.Println(fname)
-		if htmlquery.InnerText(newtag) == fname {
-			body = append(body, htmlquery.InnerText(findEntry(newtag, LINK)))
-			body = append(body, htmlquery.InnerText(findEntry(newtag, SERVICECOUNT)))
-			fields[fname] = body
+func getServiceName(node *html.Node) string {
+	nodeSpan := findEntry(node, SERVICENAME)
+	return getTag(nodeSpan, LINK)
+}
+
+func getServiceCount(node *html.Node) int {
+	return toInt(getTag(node, SERVICECOUNT))
+}
+
+func (p *Parser) getServicesNodes() map[string]*html.Node {
+	servsnodes := make(map[string]*html.Node)
+	newtags := findEntrys(p.Root, SERVICES)
+
+	if len(newtags) != len(TOPS) {
+		err := errors.New("Number of services not equals number of headers6")
+		ErrFatal(err)
+	}
+
+	for i, s := range newtags {
+		for j, h6 := range TOPS {
+			if i == j {
+				servsnodes[h6] = s
+			}
 		}
 	}
 
-	return fields
+	return servsnodes
+}
+
+func getServiceNodes(services *html.Node) []*html.Node {
+	var servnodes []*html.Node
+	newtags := findEntrys(services, SERVICE)
+
+	for _, node := range newtags {
+		servnodes = append(servnodes, node)
+	}
+
+	return servnodes
 }
 
 func (p *Parser) getSummaryFields() map[int][]string {

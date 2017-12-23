@@ -20,29 +20,19 @@ package main
 
 import (
 	"fmt"
-	//"strconv"
 	"time"
-
-	"golang.org/x/net/html"
+	//"strconv"
+	//"time"
+	//"golang.org/x/net/html"
 )
 
 const (
-	CLINK        string = "</a>"
-	PRE                 = "pre"
-	CPRE                = "</pre>"
-	SPACE               = " "
-	BACKSEP             = "</"
-	ADDED               = "Added on "
+	ADDED        string = "Added on "
 	LONGFORM            = "2017-09-09 01:30:35 UTC"
-	COLXS12             = "\"col-xs-12\""
-	ONION               = "\"onion\""
-	ONIONHREF           = "\"/onions/"
-	COLXS8              = "\"col-xs-8\""
+	PRE                 = "//pre"
 	SPAN                = "//span"
-	INDEXSUMMARY        = "//div[@class='indexsummary']"
-	SUMMARY             = "//div[@class='search-result-summary col-xs-4']"
 	LINK                = "//a"
-	HREF                = "//a[@href]"
+	HREF                = "href"
 	DETAILS             = "//a[@class='details']"
 	PAGINATION          = "//div[@class='pagination']"
 	TOTALR              = "//div[@class='bignumber']"
@@ -50,35 +40,31 @@ const (
 	SERVICES            = "//div[@class='services']"
 	SERVICENAME         = "//div[@class='span8 name']"
 	SERVICECOUNT        = "//div[@class='span4 count']"
+	HOST                = "//div[@class='search-result row-fluid']"
 	TOPSERVICES         = "Top Services"
 	TOPSOFT             = "Top Software"
 	TOPSYS              = "Top Operating Systems"
 )
 
 var TOPS = []string{
+	//TOPRES,
 	TOPSERVICES,
 	TOPSOFT,
 	TOPSYS,
 }
 
+var parser *Parser
+
 type Data struct {
 	Query string
-	Pages *Page
+	Date  time.Time
+	Page  *Page
 }
 
 type Page struct {
-	IndSummary *IndexSummary
-	Summarys   []*Summary
-	//Pagination string
-}
-
-type IndexSummary struct {
-	Totalr string
-	Servs  map[string]*Services
-}
-
-type Services struct {
-	Serv []*Service
+	Totalr   int
+	Services map[string][]*Service
+	Hosts    []*Host
 }
 
 type Service struct {
@@ -86,33 +72,14 @@ type Service struct {
 	ServiceCount string
 }
 
-type Summary struct {
+type Host struct {
 	HostUrl     string
-	Date        time.Time
+	AddDate     string
 	DetailsLink string
-	//Pre         string
+	Pre         string
 }
 
-// Constructors //////////////////////////////
-
-func NewData(query string, page *Page) *Data {
-	data := &Data{query, page}
-
-	return data
-}
-
-func NewPage(ind *IndexSummary, fields map[int][]string) *Page {
-	var summarys []*Summary
-
-	for _, value := range fields {
-		summary := NewSummary(value)
-		summarys = append(summarys, summary)
-	}
-
-	page := &Page{ind, summarys}
-
-	return page
-}
+// Constructors //////////////////////////////////
 
 func NewService(name string, count string) *Service {
 	service := &Service{name, count}
@@ -120,82 +87,43 @@ func NewService(name string, count string) *Service {
 	return service
 }
 
-func NewServices(serv []*Service) *Services {
-	services := &Services{serv}
+func NewPage(totalr int, servMap map[string][]*Service, hosts []*Host) *Page {
+	page := &Page{totalr, servMap, hosts}
 
-	return services
+	return page
 }
 
-func NewSummary(fields []string) *Summary {
-	summary := &Summary{fields[0], getTime(fields[1]), fields[2]}
+func NewHost(fields []string) *Host {
+	host := &Host{fields[0], fields[1], fields[2], fields[3]}
 
-	return summary
+	return host
 }
 
-func NewIndSummary(totalr string, svs map[string]*html.Node) *IndexSummary {
-	var servs map[string]*Services
-	var serv []*Service
+// Stringer implementations for data types ///////
 
-	for key, svsnode := range svs {
-		servnodes := getServiceNodes(svsnode)
+func (h *Host) String() string {
+	return fmt.Sprintf("Host Url = %s\n Added on = %s\n Details Link = %s\n Pre = %s\n",
+		h.HostUrl, h.AddDate, h.DetailsLink, h.Pre)
+}
 
-		for _, svnode := range servnodes {
-			name := getServiceName(svnode)
-			count := getServiceCount(svnode)
-			service := NewService(name, count)
-			serv = append(serv, service)
-			s := NewServices(serv)
+func (p *Page) String() string {
+	var hostString string
+	var servString string
 
-			servs[key] = s
+	for key, value := range p.Services {
+		for _, val := range value {
+			servString += key + ": " + val.String() + "\n"
 		}
 	}
 
-	ind := &IndexSummary{totalr, servs}
+	for _, host := range p.Hosts {
+		hostString += host.String() + "\n"
+	}
 
-	return ind
-}
-
-// Stringer Implementations of Stringer interface for all data types ///////////////////
-
-func (d *Data) String() string {
-	return fmt.Sprintf("Query = %s\n, Page = %+v\n", d.Query, d.Pages)
-}
-
-func (s *Summary) String() string {
-	return fmt.Sprintf("HostUrl = %s\n, Date = %s\n, DetailsLink = %s\n",
-		s.HostUrl, s.Date.String(), s.DetailsLink)
+	return fmt.Sprintf("Total found = %d\n Services:\n %s Hosts found:\n %s\n",
+		p.Totalr, servString, hostString)
 }
 
 func (s *Service) String() string {
 	return fmt.Sprintf("ServiceName = %s\n, ServiceCount = %s\n", s.ServiceName, s.ServiceCount)
-}
-
-func (ss *Services) String() string {
-	var servstring string
-
-	for _, s := range ss.Serv {
-		servstring += s.String() + ", "
-	}
-
-	return fmt.Sprintf("%s\n", servstring)
-}
-
-func (i *IndexSummary) String() string {
-	var servsstring string
-
-	for key, value := range i.Servs {
-		servsstring += key + ": " + value.String() + "\n"
-	}
-
-	return fmt.Sprintf("Totalr = %s\n, Services = %s\n", i.Totalr, servsstring)
-}
-
-func (p *Page) String() string {
-	var summstring string
-
-	for _, s := range p.Summarys {
-		summstring += s.String() + "\n"
-	}
-
-	return fmt.Sprintf("IndSumm = %+v\n, Summ = %s\n", p.IndSummary, p.Summarys)
 }

@@ -21,6 +21,7 @@ package main
 import (
 	"log"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -45,4 +46,8 @@ func ErrFatal(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func trimString(str string) string {
+	return strings.TrimSpace(str)
 }

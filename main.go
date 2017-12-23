@@ -33,16 +33,21 @@ type Gichidan struct {
 }
 
 func main() {
-	parser := NewParser("paypal")
+	p := NewParser("bitcoin")
 
-	services := parser.getServicesNodes()
-	//service := getServiceNodes(services)
-	totalr := parser.getTotalr()
-	summfields := parser.getSummaryFields()
-	ind := NewIndSummary(totalr, services)
-	//summary := NewSummary(summfields)
-	page := NewPage(ind, summfields)
+	tot := p.getTotalr()
+
+	fmt.Println(tot)
+
+	services := p.getServices()
+
+	servMap := p.getServMap(services)
+
+	hosts := p.getHosts()
+
+	hStructs := p.getHostsStructs(hosts)
+
+	page := NewPage(tot, servMap, hStructs)
 
 	fmt.Println(page)
-
 }

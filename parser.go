@@ -21,10 +21,10 @@ package main
 import (
 	//"net/url"
 	"fmt"
+	"strings"
 	//"strconv"
-	//"strings"
 	"bufio"
-	"errors"
+	//"errors"
 	//"time"
 
 	"github.com/antchfx/htmlquery"
@@ -84,79 +84,99 @@ func getTag(node *html.Node, tagexp string) string {
 	return htmlquery.InnerText(findEntry(node, tagexp))
 }
 
-func (p *Parser) getTotalr() int {
-	return toInt(getTag(p.Root, TOTALR))
+func (p *Parser) getServices() []*html.Node {
+	return findEntrys(p.Root, SERVICES)
 }
 
-func getServiceName(node *html.Node) string {
+func (p *Parser) getService(node *html.Node) []*html.Node {
+	return findEntrys(node, SERVICE)
+}
+
+func (p *Parser) getServMap(services []*html.Node) map[string][]*Service {
+	servMap := make(map[string][]*Service)
+
+	for i, servs := range services {
+		sNodes := p.getService(servs)
+		var servSlice []*Service
+
+		for _, srvnodes := range sNodes {
+			name := p.getServiceName(srvnodes)
+			count := p.getServiceCount(srvnodes)
+			service := NewService(name, count)
+			servSlice = append(servSlice, service)
+		}
+
+		servMap[TOPS[i]] = servSlice
+	}
+
+	return servMap
+}
+
+func (p *Parser) getServiceName(node *html.Node) string {
 	nodeSpan := findEntry(node, SERVICENAME)
 	return getTag(nodeSpan, LINK)
 }
 
-func getServiceCount(node *html.Node) int {
-	return toInt(getTag(node, SERVICECOUNT))
+func (p *Parser) getServiceCount(node *html.Node) string {
+	return (getTag(node, SERVICECOUNT))
 }
 
-func (p *Parser) getServicesNodes() map[string]*html.Node {
-	servsnodes := make(map[string]*html.Node)
-	newtags := findEntrys(p.Root, SERVICES)
-
-	if len(newtags) != len(TOPS) {
-		err := errors.New("Number of services not equals number of headers6")
-		ErrFatal(err)
-	}
-
-	for i, s := range newtags {
-		for j, h6 := range TOPS {
-			if i == j {
-				servsnodes[h6] = s
-			}
-		}
-	}
-
-	return servsnodes
+func (p *Parser) getTotalr() int {
+	return toInt(trimString((getTag(p.Root, TOTALR))))
 }
 
-func getServiceNodes(services *html.Node) []*html.Node {
-	var servnodes []*html.Node
-	newtags := findEntrys(services, SERVICE)
-
-	for _, node := range newtags {
-		servnodes = append(servnodes, node)
-	}
-
-	return servnodes
+func (p *Parser) getHref(node *html.Node) string {
+	return htmlquery.SelectAttr(node, HREF)
 }
 
-func (p *Parser) getSummaryFields() map[int][]string {
-	nodes := findEntrys(p.Root, SUMMARY)
-	fields := make(map[int][]string)
-	var body []string
+func (p *Parser) getHosts() []*html.Node {
+	return findEntrys(p.Root, HOST)
+}
 
-	for i, newtag := range nodes {
-		body = append(body, htmlquery.InnerText(findEntry(newtag, HREF)))
-		body = append(body, htmlquery.InnerText(findEntry(newtag, SPAN)))
-		body = append(body, htmlquery.InnerText(findEntry(newtag, DETAILS)))
-		//details := findEntry(newtag, DETAILS)
-		/*
-			for _, attr := range details.Attr {
-				if details.Key == "href" {
-					body = append(body, details.Val)
-					break
-				}
-			}*/
+func (p *Parser) getHostFields(node *html.Node) []string {
+	var fields []string
 
-		body = append(body, htmlquery.InnerText(findEntry(newtag, PRE)))
-		fields[i] = body
-	}
+	links := findEntrys(node, LINK)
+	hostUrl := p.getHref(links[0])
+
+	addDate := getTag(node, SPAN)
+	dateTrimmed := strings.TrimPrefix(addDate, ADDED)
+
+	detailsLink := p.getHref(links[1])
+	pre := getTag(node, PRE)
+
+	fields = append(fields, hostUrl)
+	fields = append(fields, dateTrimmed)
+	fields = append(fields, detailsLink)
+	fields = append(fields, pre)
 
 	return fields
 }
 
-/*
-func (p *Parser) getPagination() string {
-	node := htmlquery.InnerText(findEntry(p.Root, PAGINATION))
+func (p *Parser) getHostsStructs(hosts []*html.Node) []*Host {
+	var newhosts []*Host
 
-	return node
+	for _, h := range hosts {
+		fields := p.getHostFields(h)
+		hStruct := NewHost(fields)
+		newhosts = append(newhosts, hStruct)
+	}
+
+	return newhosts
 }
-*/
+
+func (p *Parser) getPagination() []string {
+	var links []string
+
+	pagination := findEntry(p.Root, PAGINATION)
+	hrefs := findEntrys(pagination, LINK)
+
+	for _, newtag := range hrefs {
+		if htmlquery.InnerText(newtag) != "Previous" && htmlquery.InnerText(newtag) != "Next" {
+			link := p.getHref(newtag)
+			links = append(links, link)
+		}
+	}
+
+	return links
+}

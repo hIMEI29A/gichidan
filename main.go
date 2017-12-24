@@ -18,7 +18,23 @@
 
 package main
 
-import "fmt"
+import (
+	"flag"
+	"fmt"
+	"os"
+	"os/exec"
+)
+
+// getVersion parses git to get current app's version
+func getVersion() func() string {
+	return func() string {
+		getVerCmd := exec.Command("git", "describe", "--tags")
+		getVerOut, err := getVerCmd.Output()
+		ErrFatal(err)
+
+		return string(getVerOut)
+	}
+}
 
 // Gichidan represents main app type
 type Gichidan struct {
@@ -28,21 +44,28 @@ type Gichidan struct {
 }
 
 func main() {
+	var (
+		// "Search" subcommand
+		//searchCmd = flag.NewFlagSet("search", flag.ExitOnError)
+		//requestFlag = searchCmd.String("r", "", "your search request to Ichidan")
+
+		// Version flag gets current app's version
+		version    = getVersion()
+		versionCmd = flag.Bool("v", false, "print current version")
+	)
+
+	flag.Parse()
+
+	if *versionCmd {
+		fmt.Println(version())
+		os.Exit(1)
+	}
+
+	if len(os.Args) == 1 {
+		fmt.Println("Usage: gichidan <command> [<args>]")
+		os.Exit(1)
+	}
+
 	p := NewParser("ichidan")
-
-	tot := p.getTotalr()
-
-	fmt.Println(tot)
-
-	services := p.getServices()
-
-	servMap := p.getServMap(services)
-
-	hosts := p.getHosts()
-
-	hStructs := p.getHostsStructs(hosts)
-
-	page := NewPage(tot, servMap, hStructs)
-
-	fmt.Println(page)
+	p.Parse()
 }

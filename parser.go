@@ -98,6 +98,16 @@ func checkResult(node *html.Node) bool {
 	return check
 }
 
+func (p *Parser) Parse() {
+	tot := p.getTotalr()
+	services := p.getServices()
+	servMap := p.getServMap(services)
+	hosts := p.getHosts()
+	hStructs := p.getHostsStructs(hosts)
+	page := NewPage(tot, servMap, hStructs)
+	fmt.Println(page)
+}
+
 func (p *Parser) getServices() []*html.Node {
 	return findEntrys(p.Root, SERVICES)
 }

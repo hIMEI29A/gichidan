@@ -20,7 +20,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -39,20 +38,6 @@ const (
 type Parser struct {
 	Request string
 	Root    *html.Node
-}
-
-// NewParser creates instance of Parser
-func NewParser(request string) *Parser {
-	rootNode := getBody(request)
-
-	if checkResult(rootNode) == false {
-		err := errors.New("Nothing found there, Neo!")
-		ErrFatal(err)
-	}
-
-	parser := &Parser{request, rootNode}
-
-	return parser
 }
 
 // Get body makes request to search engine and gets response body

@@ -13,42 +13,20 @@
 // limitations under the License.
 /////////////////////////////////////////////////////////////////////////
 // @Author: hIMEI
-// @Date:   2017-12-17 21:29:46
+// @Date:   2017-12-24 14:26:00
 /////////////////////////////////////////////////////////////////////////
 
 package main
 
-import (
-	"log"
-	"strconv"
-	"strings"
-	"time"
-)
+//import (
+//	"fmt"
+//
+//	"github.com/antchfx/htmlquery"
+//	"github.com/hIMEI29A/gotorsocks"
+//	"golang.org/x/net/html"
+//)
 
-// Toint converts string to int and handle errors
-func toInt(str string) int {
-	intCount, err := strconv.Atoi(str)
-	ErrFatal(err)
-
-	return intCount
-}
-
-// Gettime converts string to time.Time
-func getTime(timestring string) time.Time {
-	fulltime, err := time.Parse(LONGFORM, timestring)
-	ErrFatal(err)
-
-	return fulltime
-}
-
-// ErrFatal is the basic errors handler
-func ErrFatal(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// trimString trims trailing and leading spaces from string
-func trimString(str string) string {
-	return strings.TrimSpace(str)
+type Spider struct {
+	Parser
+	Urls []string
 }

@@ -24,21 +24,6 @@ import (
 )
 
 const (
-	RED   string = "\x1B[31m"
-	GRN          = "\x1B[32m"
-	YEL          = "\x1B[33m"
-	BLU          = "\x1B[34m"
-	MAG          = "\x1B[35m"
-	CYN          = "\x1B[36m"
-	WHT          = "\x1B[97m"
-	RESET        = "\x1B[0m"
-	BOLD         = "\x1B[1m"
-	LINE         = "\x1B[4m"
-	INV          = "\x1B[7m"
-	ITAL         = "\x1B[3m"
-)
-
-const (
 	ADDED        string = "Added on "
 	DELIM               = "]===================================================[\n"
 	LONGFORM            = "2017-09-09 01:30:35 UTC"

@@ -19,13 +19,10 @@
 package main
 
 import (
-	//"net/url"
+	"bufio"
+	"errors"
 	"fmt"
 	"strings"
-	//"strconv"
-	"bufio"
-	//"errors"
-	//"time"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/hIMEI29A/gotorsocks"
@@ -47,6 +44,12 @@ type Parser struct {
 // NewParser creates instance of Parser
 func NewParser(request string) *Parser {
 	rootNode := getBody(request)
+
+	if checkResult(rootNode) == false {
+		err := errors.New("Nothing found there, Neo!")
+		ErrFatal(err)
+	}
+
 	parser := &Parser{request, rootNode}
 
 	return parser
@@ -84,6 +87,17 @@ func getTag(node *html.Node, tagexp string) string {
 	return htmlquery.InnerText(findEntry(node, tagexp))
 }
 
+func checkResult(node *html.Node) bool {
+	check := true
+
+	result := findEntry(node, NORESULT)
+	if result != nil {
+		check = false
+	}
+
+	return check
+}
+
 func (p *Parser) getServices() []*html.Node {
 	return findEntrys(p.Root, SERVICES)
 }
@@ -118,11 +132,13 @@ func (p *Parser) getServiceName(node *html.Node) string {
 }
 
 func (p *Parser) getServiceCount(node *html.Node) string {
-	return (getTag(node, SERVICECOUNT))
+	return trimString((getTag(node, SERVICECOUNT)))
 }
 
 func (p *Parser) getTotalr() int {
-	return toInt(trimString((getTag(p.Root, TOTALR))))
+	totalr := toInt(trimString((getTag(p.Root, TOTALR))))
+
+	return totalr
 }
 
 func (p *Parser) getHref(node *html.Node) string {

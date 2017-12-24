@@ -21,19 +21,16 @@ package main
 import (
 	"fmt"
 	"time"
-	//"strconv"
-	//"time"
-	//"golang.org/x/net/html"
 )
 
 const (
 	ADDED        string = "Added on "
+	DELIM               = "]===================================================[\n"
 	LONGFORM            = "2017-09-09 01:30:35 UTC"
 	PRE                 = "//pre"
 	SPAN                = "//span"
 	LINK                = "//a"
 	HREF                = "href"
-	DETAILS             = "//a[@class='details']"
 	PAGINATION          = "//div[@class='pagination']"
 	TOTALR              = "//div[@class='bignumber']"
 	SERVICE             = "//div[@class='service']"
@@ -41,24 +38,22 @@ const (
 	SERVICENAME         = "//div[@class='span8 name']"
 	SERVICECOUNT        = "//div[@class='span4 count']"
 	HOST                = "//div[@class='search-result row-fluid']"
+	NORESULT            = "//div[@class='msg alert alert-info']"
 	TOPSERVICES         = "Top Services"
 	TOPSOFT             = "Top Software"
 	TOPSYS              = "Top Operating Systems"
 )
 
 var TOPS = []string{
-	//TOPRES,
 	TOPSERVICES,
 	TOPSOFT,
 	TOPSYS,
 }
 
-var parser *Parser
-
 type Data struct {
 	Query string
 	Date  time.Time
-	Page  *Page
+	Page  []*Page
 }
 
 type Page struct {
@@ -79,7 +74,9 @@ type Host struct {
 	Pre         string
 }
 
+//////////////////////////////////////////////////
 // Constructors //////////////////////////////////
+//////////////////////////////////////////////////
 
 func NewService(name string, count string) *Service {
 	service := &Service{name, count}
@@ -99,11 +96,13 @@ func NewHost(fields []string) *Host {
 	return host
 }
 
+//////////////////////////////////////////////////
 // Stringer implementations for data types ///////
+//////////////////////////////////////////////////
 
 func (h *Host) String() string {
-	return fmt.Sprintf("Host Url = %s\n Added on = %s\n Details Link = %s\n Pre = %s\n",
-		h.HostUrl, h.AddDate, h.DetailsLink, h.Pre)
+	return fmt.Sprintf("Host Url %s\n Added on %s\n Details:  %s\n\n %s\n %s\n",
+		h.HostUrl, h.AddDate, h.DetailsLink, h.Pre, DELIM)
 }
 
 func (p *Page) String() string {
@@ -120,10 +119,10 @@ func (p *Page) String() string {
 		hostString += host.String() + "\n"
 	}
 
-	return fmt.Sprintf("Total found = %d\n Services:\n %s Hosts found:\n %s\n",
+	return fmt.Sprintf("Total found = %d\n\n Services:\n\n %s Hosts found:\n %s\n",
 		p.Totalr, servString, hostString)
 }
 
 func (s *Service) String() string {
-	return fmt.Sprintf("ServiceName = %s\n, ServiceCount = %s\n", s.ServiceName, s.ServiceCount)
+	return fmt.Sprintf("Name = %s\n Number = %s\n", s.ServiceName, s.ServiceCount)
 }

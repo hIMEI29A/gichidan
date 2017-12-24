@@ -13,36 +13,15 @@
 // limitations under the License.
 /////////////////////////////////////////////////////////////////////////
 // @Author: hIMEI
-// @Date:   2017-12-17 21:29:46
+// @Date:   2017-12-23 00:55:00
 /////////////////////////////////////////////////////////////////////////
 
 package main
 
-import "fmt"
+import (
+	"flag"
+)
 
-// Gichidan represents main app type
-type Gichidan struct {
-	Data
-
-	Parser
-}
-
-func main() {
-	p := NewParser("ichidan")
-
-	tot := p.getTotalr()
-
-	fmt.Println(tot)
-
-	services := p.getServices()
-
-	servMap := p.getServMap(services)
-
-	hosts := p.getHosts()
-
-	hStructs := p.getHostsStructs(hosts)
-
-	page := NewPage(tot, servMap, hStructs)
-
-	fmt.Println(page)
-}
+var (
+	searchCmd = flag.NewFlagSet("search", flag.ExitOnError)
+)

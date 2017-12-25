@@ -19,7 +19,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -57,23 +56,7 @@ func getVersion() func() string {
 // Gichidan represents main app type
 type Gichidan struct {
 	Data
-	Spider
-}
-
-//func (gichidan *Gichidan) NewSpider
-
-// NewParser creates instance of Parser
-func (gichidan *Gichidan) NewParser(request string) *Parser {
-	rootNode := getBody(request)
-
-	if checkResult(rootNode) == false {
-		err := errors.New("Nothing found there, Neo!")
-		ErrFatal(err)
-	}
-
-	parser := &Parser{request, rootNode}
-
-	return parser
+	Parser
 }
 
 func main() {

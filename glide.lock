@@ -1,15 +1,18 @@
 hash: f5c38589c197d19c681bec27f9a05095e89843c43afe3b0a3654c91509c32fdd
-updated: 2017-12-19T18:43:26.875799096-05:00
+updated: 2017-12-26T18:53:30.960441402-05:00
 imports:
 - name: github.com/antchfx/htmlquery
   version: 9f7717ac9bac5f660391c57e3d496b3c7cf9741f
 - name: github.com/antchfx/xpath
   version: 58d12fe685d684ed55aab3b988394652025e36dc
 - name: github.com/hIMEI29A/gotorsocks
-  version: b1924e129c4952b72f546adfdd5addfd9ecbfd74
+  version: e9656517d9d12472acf6bb9f28fee3247599fb71
+- name: github.com/mattn/go-sqlite3
+  version: d5ffb5c0cca8778699a929b236766f4a7af674e8
 - name: golang.org/x/net
   version: d866cfc389cec985d6fda2859936a575a55a3ab6
   subpackages:
+  - context
   - html
   - html/atom
   - html/charset

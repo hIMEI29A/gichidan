@@ -1,8 +1,7 @@
 IMPORT_PATH := github.com/hIMEI29A/gichidan
-DOCKER_IMAGE := gichidan
 build_dir := $(CURDIR)/build
 dist_dir := $(CURDIR)/dist
-exec := $(DOCKER_IMAGE)
+# exec := $(DOCKER_IMAGE)
 github_repo := hIMEI29A/gichidan
 
 # comment this line out for quieter things
@@ -13,12 +12,6 @@ IGNORED_PACKAGES := /vendor/
 
 .PHONY: all
 all: test build
-
-.PHONY: safebuild
-# safebuild builds inside a docker container with no clingons from your $GOPATH
-safebuild:
-	@echo "Building..."
-	$Q docker build .
 
 .PHONY: build
 build:
@@ -40,64 +33,59 @@ tags:
 
 ##### =====> Utility targets <===== #####
 
-.PHONY: clean test list cover format docker deps
+.PHONY: clean list format deps
 
 deps: setup
 	@echo "Ensuring Dependencies..."
 	$Q go env
 	$Q dep ensure
 
-docker:
-	@echo "Docker Build..."
-	$Q docker build -t $(DOCKER_IMAGE) .
-
 clean:
 	@echo "Clean..."
 	$Q rm -rf bin
 
-
-test:
-	@echo "Testing..."
-	$Q go test $(if $V,-v) -i -race $(allpackages) # install -race libs to speed up next run
-ifndef CI
-	@echo "Testing Outside CI..."
-	$Q go vet $(allpackages)
-	$Q GODEBUG=cgocheck=2 go test -race $(allpackages)
-else
-	@echo "Testing in CI..."
-	$Q mkdir -p test
-	$Q ( go vet $(allpackages); echo $$? ) | \
-       tee test/vet.txt | sed '$$ d'; exit $$(tail -1 test/vet.txt)
-	$Q ( GODEBUG=cgocheck=2 go test -v -race $(allpackages); echo $$? ) | \
-       tee test/output.txt | sed '$$ d'; exit $$(tail -1 test/output.txt)
-endif
+#test:
+#	@echo "Testing..."
+#	$Q go test $(if $V,-v) -i -race $(allpackages) # install -race libs to speed up next run
+#ifndef CI
+#	@echo "Testing Outside CI..."
+#	$Q go vet $(allpackages)
+#	$Q GODEBUG=cgocheck=2 go test -race $(allpackages)
+#else
+#	@echo "Testing in CI..."
+#	$Q mkdir -p test
+#	$Q ( go vet $(allpackages); echo $$? ) | \
+#       tee test/vet.txt | sed '$$ d'; exit $$(tail -1 test/vet.txt)
+#	$Q ( GODEBUG=cgocheck=2 go test -v -race $(allpackages); echo $$? ) | \
+#       tee test/output.txt | sed '$$ d'; exit $$(tail -1 test/output.txt)
+#endif
 
 list:
 	@echo "List..."
 	@echo $(allpackages)
 
-cover: $(GOPATH)/bin/gocovmerge
-	@echo "Coverage Report..."
-	@echo "NOTE: make cover does not exit 1 on failure, don't use it to check for tests success!"
-	$Q rm -f .GOPATH/cover/*.out cover/all.merged
-	$(if $V,@echo "-- go test -coverpkg=./... -coverprofile=cover/... ./...")
-	@for MOD in $(allpackages); do \
-        go test -coverpkg=`echo $(allpackages)|tr " " ","` \
-            -coverprofile=cover/unit-`echo $$MOD|tr "/" "_"`.out \
-            $$MOD 2>&1 | grep -v "no packages being tested depend on"; \
-    done
-	$Q gocovmerge cover/*.out > cover/all.merged
-ifndef CI
-	@echo "Coverage Report..."
-	$Q go tool cover -html .GOPATH/cover/all.merged
-else
-	@echo "Coverage Report In CI..."
-	$Q go tool cover -html .GOPATH/cover/all.merged -o .GOPATH/cover/all.html
-endif
-	@echo ""
-	@echo "=====> Total test coverage: <====="
-	@echo ""
-	$Q go tool cover -func .GOPATH/cover/all.merged
+#cover: $(GOPATH)/bin/gocovmerge
+#	@echo "Coverage Report..."
+#	@echo "NOTE: make cover does not exit 1 on failure, don't use it to check for tests success!"
+#	$Q rm -f .GOPATH/cover/*.out cover/all.merged
+#	$(if $V,@echo "-- go test -coverpkg=./... -coverprofile=cover/... ./...")
+#	@for MOD in $(allpackages); do \
+#        go test -coverpkg=`echo $(allpackages)|tr " " ","` \
+#            -coverprofile=cover/unit-`echo $$MOD|tr "/" "_"`.out \
+#            $$MOD 2>&1 | grep -v "no packages being tested depend on"; \
+#    done
+#	$Q gocovmerge cover/*.out > cover/all.merged
+#ifndef CI
+#	@echo "Coverage Report..."
+#	$Q go tool cover -html .GOPATH/cover/all.merged
+#else
+#	@echo "Coverage Report In CI..."
+#	$Q go tool cover -html .GOPATH/cover/all.merged -o .GOPATH/cover/all.html
+#endif
+#	@echo ""
+#	@echo "=====> Total test coverage: <====="
+#	@echo ""
+#	$Q go tool cover -func .GOPATH/cover/all.merged
 
 format: $(GOPATH)/bin/goimports
 	@echo "Formatting..."

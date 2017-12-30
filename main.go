@@ -1,5 +1,5 @@
 // Copyright 2017 hIMEI
-//
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,10 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/////////////////////////////////////////////////////////////////////////
-// @Author: hIMEI
-// @Date:   2017-12-17 21:29:46
-/////////////////////////////////////////////////////////////////////////
 
 package main
 
@@ -53,9 +49,22 @@ func getVersion() func() string {
 	}
 }
 
+/*
+func toFile(filename string, output []*Host) {
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE, 0666)
+	ErrFatal(err)
+	defer file.Close()
+
+	for _, s := range output {
+		file.WriteString(s.String() + "\n\n\n")
+	}
+}
+*/
+
 // Gichidan represents main app type
 type Gichidan struct {
-	Data
+	Host
+	Spider
 	Parser
 }
 
@@ -68,7 +77,8 @@ func main() {
 		// Version flag gets current app's version
 		version    = getVersion()
 		versionCmd = flag.Bool("v", false, "print current version")
-		helpCmd    = flag.Bool("h", false, "print help message")
+
+		//toFileCmd = flag.String("f", "", "save output to file")
 
 		// usage prints short help message
 		usage = func() {
@@ -77,7 +87,7 @@ func main() {
 			fmt.Println("\t\t", BLU, "Commands:", GRN, "\t", "search")
 			fmt.Println("\t\t", BLU, "Args:", GRN, "\t", "-r", "\t", "your search request to Ichidan")
 			fmt.Println("\t\t", BLU, "Options:", GRN, "\t", "-v", "\t", "app's current version")
-			fmt.Println("\t\t\t\t", "-h", "\t", "prints this message", RESET, "\n")
+			fmt.Println("\t\t\t\t", "-h", "\t", "prints this message", RESET)
 		}
 	)
 
@@ -88,8 +98,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *helpCmd || len(os.Args) < 2 {
-		usage()
+	if len(os.Args) < 2 {
+		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
@@ -108,6 +118,16 @@ func main() {
 		}
 	}
 
-	p := NewParser(*requestFlag)
-	p.Parse()
+	request := *requestFlag
+	//fmt.Println(request)
+
+	parser := NewParser(request)
+	hosts := parser.parseAll(request)
+
+	for _, h := range hosts {
+		fmt.Println(h)
+	}
+
+	//	toFile(*toFileCmd, hosts)
+
 }

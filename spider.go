@@ -16,7 +16,7 @@ package main
 
 import (
 	"bufio"
-	//"errors"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -37,11 +37,14 @@ const (
 // Spider is an async urls handler
 type Spider struct {
 	// Urls to crawl
-	Urls []string
+	Url string
+	// Urls already being handled
+	HandledUrls []string
 }
 
-func NewSpider(urls []string) *Spider {
-	spider := &Spider{urls}
+func NewSpider(url string) *Spider {
+	var handled []string
+	spider := &Spider{url, handled}
 
 	return spider
 }
@@ -91,46 +94,77 @@ func getContents(request string) *html.Node {
 	return node
 }
 
-func (s *Spider) Crawl() <-chan *html.Node {
-	fmt.Printf("Need to handle %d urls \n", len(s.Urls))
-	fmt.Println(len(s.Urls))
+// CheckResult controls empty search results
+func checkResult(node *html.Node) bool {
+	ch := true
 
-	var count int
-	recieve := make(chan *html.Node, 12)
-
-	fmt.Println(s.Urls[0])
-	for i := 0; i < len(s.Urls); i++ {
-		fmt.Println("BEBE")
-		go func() {
-			fmt.Println("MEME")
-			SLEEPER()
-			//time.Sleep(500 * time.Millisecond)
-			fmt.Println(s.Urls[i])
-			node := getContents(s.Urls[i])
-			if node == nil {
-				fmt.Println("node not ready")
-			}
-			recieve <- node
-		}()
+	result := findEntry(node, NORESULT)
+	if result != nil {
+		ch = false
 	}
 
-	fmt.Printf("Started %d workers\n", count)
-
-	return recieve
+	return ch
 }
 
-func (s *Spider) Collect(recieve <-chan *html.Node) []*html.Node {
-	var nodes []*html.Node
-	for i := 0; i < len(s.Urls); i++ {
-		select {
-		case node := <-recieve:
-			fmt.Println("node recieved")
-			nodes = append(nodes, node)
-		default:
-			//			SLEEPER()
-			//			fmt.Println(i, "Waiting...")
+func (s *Spider) checkVisited(url string) bool {
+	check := false
+
+	for _, handled := range s.HandledUrls {
+		if handled == url {
+			check = true
+			break
 		}
 	}
 
-	return nodes
+	return check
+}
+
+func (s *Spider) Crawl(url string, channelDone chan bool, channelBody chan *html.Node) {
+	body := getContents(url)
+
+	defer func() {
+		channelDone <- true
+	}()
+
+	if checkResult(body) != false {
+		err := errors.New("Nothing found there, Neo!")
+		ErrFatal(err)
+	}
+
+	channelBody <- body
+	s.HandledUrls = append(s.HandledUrls, url)
+
+	newUrls := s.getPagination(body)
+
+	for _, newurl := range newUrls {
+		if s.checkVisited(newurl) == false {
+			go s.Crawl(newurl, channelDone, channelBody)
+		}
+	}
+}
+
+func (s *Spider) getPagination(node *html.Node) []string {
+	var links []string
+
+	pagination := findEntry(node, PAGINATION)
+
+	if pagination != nil {
+		hrefs := findEntrys(pagination, LINK)
+
+		for _, newtag := range hrefs {
+			if htmlquery.InnerText(newtag) != "Previous" &&
+				htmlquery.InnerText(newtag) != "Next" &&
+				htmlquery.InnerText(newtag) != "1" {
+				link := requestProvider(getHref(newtag))
+
+				if s.checkVisited(link) == false {
+					links = append(links, link)
+				}
+			}
+		}
+	} else {
+		fmt.Println("No more pages")
+	}
+
+	return links
 }

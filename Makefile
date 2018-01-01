@@ -1,7 +1,6 @@
 IMPORT_PATH := github.com/hIMEI29A/gichidan
 build_dir := $(CURDIR)/build
 dist_dir := $(CURDIR)/dist
-# exec := $(DOCKER_IMAGE)
 github_repo := hIMEI29A/gichidan
 
 # comment this line out for quieter things
@@ -11,7 +10,7 @@ V := 1 # When V is set, print commands and build progress.
 IGNORED_PACKAGES := /vendor/
 
 .PHONY: all
-all: test build
+all: build
 
 .PHONY: build
 build:
@@ -22,12 +21,6 @@ build:
 tags:
 	@echo "Listing tags..."
 	$Q @git tag
-
-
-### Code not in the repository root? Another binary? Add to the path like this.
-# .PHONY: otherbin
-# otherbin: .GOPATH/.ok
-#   $Q go install $(if $V,-v) $(IMPORT_PATH)/cmd/otherbin
 
 ##### ^^^^^^ EDIT ABOVE ^^^^^^ #####
 
@@ -99,7 +92,7 @@ setup: clean
 	@echo "Setup..."
 	mkdir -p cover
 	mkdir -p bin
-	mkdir -p test
+#	mkdir -p test
 	go get -u github.com/golang/dep/cmd/dep
 	go get github.com/wadey/gocovmerge
 	go get golang.org/x/tools/cmd/goimports

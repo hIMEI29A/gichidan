@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"golang.org/x/net/html"
 )
 
 const (
@@ -88,6 +90,7 @@ func main() {
 			fmt.Println("\t\t", BLU, "Args:", GRN, "\t", "-r", "\t", "your search request to Ichidan")
 			fmt.Println("\t\t", BLU, "Options:", GRN, "\t", "-v", "\t", "app's current version")
 			fmt.Println("\t\t\t\t", "-h", "\t", "prints this message", RESET)
+			fmt.Println("\n")
 		}
 	)
 
@@ -99,7 +102,7 @@ func main() {
 	}
 
 	if len(os.Args) < 2 {
-		flag.PrintDefaults()
+		usage()
 		os.Exit(1)
 	}
 
@@ -118,16 +121,32 @@ func main() {
 		}
 	}
 
-	request := *requestFlag
+	request := requestProvider(*requestFlag)
 	//fmt.Println(request)
 
-	parser := NewParser(request)
-	hosts := parser.parseAll(request)
+	channelBody := make(chan *html.Node)
+	channelDone := make(chan bool)
 
-	for _, h := range hosts {
-		fmt.Println(h)
+	var parsedHosts []*Host
+
+	s := NewSpider(request)
+
+	s.Crawl(request, channelDone, channelBody)
+
+	for {
+		select {
+		case recievedNode := <-channelBody:
+			newHosts := gichidan.parseOne(recievedNode)
+			for _, h := range newHosts {
+				parsedHosts = append(parsedHosts, h)
+			}
+
+		case <-channelDone:
+			break
+		}
 	}
 
-	//	toFile(*toFileCmd, hosts)
-
+	for _, m := range parsedHosts {
+		fmt.Println(m.String())
+	}
 }

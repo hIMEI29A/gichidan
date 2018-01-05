@@ -126,7 +126,7 @@ func (s *Spider) Crawl(url string, channelDone chan bool, channelBody chan *html
 		channelDone <- true
 	}()
 
-	if checkResult(body) != false {
+	if checkResult(body) == false {
 		err := errors.New("Nothing found there, Neo!")
 		ErrFatal(err)
 	}
@@ -137,7 +137,7 @@ func (s *Spider) Crawl(url string, channelDone chan bool, channelBody chan *html
 	newUrls := s.getPagination(body)
 
 	for _, newurl := range newUrls {
-		if s.checkVisited(newurl) == false {
+		if s.checkVisited(newurl) != false {
 			go s.Crawl(newurl, channelDone, channelBody)
 		}
 	}

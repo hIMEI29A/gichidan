@@ -124,26 +124,32 @@ func main() {
 	request := requestProvider(*requestFlag)
 	//fmt.Println(request)
 
-	channelBody := make(chan *html.Node)
+	channelBody := make(chan *html.Node, 120)
 	channelDone := make(chan bool)
 
 	var parsedHosts []*Host
 
 	s := NewSpider(request)
+	p := NewParser(request)
+	//fmt.Println(request)
 
-	s.Crawl(request, channelDone, channelBody)
+	go s.Crawl(request, channelDone, channelBody)
 
 	for {
 		select {
 		case recievedNode := <-channelBody:
-			newHosts := gichidan.parseOne(recievedNode)
+			newHosts := p.parseOne(recievedNode)
 			for _, h := range newHosts {
 				parsedHosts = append(parsedHosts, h)
+				fmt.Println("added", h.HostUrl)
 			}
 
 		case <-channelDone:
+			fmt.Println("Jobs finished")
 			break
 		}
+
+		break
 	}
 
 	for _, m := range parsedHosts {

@@ -57,7 +57,8 @@ func NewHost(fields []string, services []*Service) *Host {
 }
 
 func (s *Service) String() string {
-	return fmt.Sprintf("%s %s %s %s %s %s", s.Name, s.Port, s.Protocol, s.State, s.Version, s.ServDetails)
+	return fmt.Sprintf("%s\n %s\n %s\n %s\n %s\n %s\n",
+		s.Name, s.Port, s.Protocol, s.State, s.Version, s.ServDetails)
 }
 
 func (h *Host) String() string {
@@ -67,5 +68,5 @@ func (h *Host) String() string {
 		servs += s.String() + "\n"
 	}
 
-	return fmt.Sprintf("%s %s %s", h.HostUrl, h.AddDate, servs)
+	return fmt.Sprintf("%s\n %s\n %s\n", h.HostUrl, h.AddDate, servs)
 }

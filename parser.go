@@ -111,7 +111,7 @@ func (p *Parser) parseOne(node *html.Node) []*Host {
 
 		detailslink := getHref(findEntry(h, DETAILS))
 		req := requestProvider(detailslink)
-		dnode := getContents(req) // TODO: gorutines
+		dnode := getContents(req)
 		srvNodes := findEntrys(dnode, SERVICELONG)
 
 		for _, srv := range srvNodes {
@@ -155,7 +155,7 @@ func (p *Parser) getServiceFields(node *html.Node) []string {
 	if findEntry(node, VERSION) != nil {
 		fields = append(fields, getTag(node, VERSION))
 	} else {
-		fields = append(fields, getTag(node, NONE))
+		fields = append(fields, "unknown VERSION")
 	}
 
 	fields = append(fields, getTag(node, PRE))

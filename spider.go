@@ -29,9 +29,8 @@ import (
 
 // Consts for connecting to search engine
 const (
-	ICHIDAN     string = "ichidanv34wrx7m7.onion"
-	ICHIDANPORT        = ":80"
-	SEARCH             = "/search?query="
+	ICHIDAN string = "ichidanv34wrx7m7.onion:80"
+	SEARCH         = "/search?query="
 )
 
 // Spider is an async urls handler
@@ -51,6 +50,7 @@ func NewSpider(url string) *Spider {
 
 func requestProvider(request string) string {
 	var fullRequest string
+
 	switch {
 	case string(request[0]) == "/":
 		fullRequest = "GET " + request + "\n"
@@ -81,8 +81,7 @@ func connectProvider(url string) net.Conn {
 
 // getContents makes request to search engine and gets response body
 func getContents(request string) *html.Node {
-	url := ICHIDAN + ICHIDANPORT
-	connect := connectProvider(url)
+	connect := connectProvider(ICHIDAN)
 	defer connect.Close()
 
 	fmt.Fprintf(connect, request)
@@ -133,11 +132,16 @@ func (s *Spider) Crawl(url string, channelDone chan bool, channelBody chan *html
 
 	channelBody <- body
 	s.HandledUrls = append(s.HandledUrls, url)
+	fmt.Println("Handled ", url)
 
 	newUrls := s.getPagination(body)
 
+	//	for _, u := range newUrls {
+	//		fmt.Println(u)
+	//	}
+
 	for _, newurl := range newUrls {
-		if s.checkVisited(newurl) != false {
+		if s.checkVisited(newurl) == false {
 			go s.Crawl(newurl, channelDone, channelBody)
 		}
 	}
@@ -157,9 +161,9 @@ func (s *Spider) getPagination(node *html.Node) []string {
 				htmlquery.InnerText(newtag) != "1" {
 				link := requestProvider(getHref(newtag))
 
-				if s.checkVisited(link) == false {
-					links = append(links, link)
-				}
+				//				if s.checkVisited(link) == false {
+				links = append(links, link)
+				//				}
 			}
 		}
 	} else {

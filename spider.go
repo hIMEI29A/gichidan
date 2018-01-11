@@ -136,12 +136,13 @@ func (s *Spider) Crawl(url string, channelDone chan bool, channelBody chan *html
 
 	newUrls := s.getPagination(body)
 
-	//	for _, u := range newUrls {
-	//		fmt.Println(u)
-	//	}
+	for _, u := range newUrls {
+		fmt.Println(u)
+	}
 
-	for _, newurl := range newUrls {
+	for i, newurl := range newUrls {
 		if s.checkVisited(newurl) == false {
+			fmt.Println(i)
 			go s.Crawl(newurl, channelDone, channelBody)
 		}
 	}

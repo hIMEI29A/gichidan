@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
 
 	"golang.org/x/net/html"
 )
@@ -125,34 +126,30 @@ func main() {
 	//fmt.Println(request)
 
 	channelBody := make(chan *html.Node, 120)
-	channelDone := make(chan bool)
 
 	var parsedHosts []*Host
+	wg := &sync.WaitGroup{}
 
 	s := NewSpider(request)
 	p := NewParser(request)
 	//fmt.Println(request)
 
-	go s.Crawl(request, channelDone, channelBody)
+	go s.Crawl(request, channelBody, wg)
 
 	for {
-		select {
-		case recievedNode := <-channelBody:
-			newHosts := p.parseOne(recievedNode)
-			for _, h := range newHosts {
-				parsedHosts = append(parsedHosts, h)
-				fmt.Println("added", h.HostUrl)
-			}
+		recievedNode := <-channelBody
+		newHosts := p.parseOne(recievedNode)
 
-		case <-channelDone:
-			fmt.Println("Jobs finished")
-			break
+		for _, h := range newHosts {
+			parsedHosts = append(parsedHosts, h)
+			fmt.Println("added", h.HostUrl)
 		}
 
-		break
-	}
+		wg.Wait()
 
-	for _, m := range parsedHosts {
-		fmt.Println(m.String())
+		for _, m := range parsedHosts {
+			fmt.Println(m.String())
+		}
 	}
+	//close(channelBody)
 }

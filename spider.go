@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"sync"
 	//"time"
 
 	"github.com/antchfx/htmlquery"
@@ -118,12 +119,9 @@ func (s *Spider) checkVisited(url string) bool {
 	return check
 }
 
-func (s *Spider) Crawl(url string, channelDone chan bool, channelBody chan *html.Node) {
-	body := getContents(url)
+func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGroup) {
 
-	defer func() {
-		channelDone <- true
-	}()
+	body := getContents(url)
 
 	if checkResult(body) == false {
 		err := errors.New("Nothing found there, Neo!")
@@ -136,16 +134,18 @@ func (s *Spider) Crawl(url string, channelDone chan bool, channelBody chan *html
 
 	newUrls := s.getPagination(body)
 
-	for _, u := range newUrls {
-		fmt.Println(u)
-	}
-
-	for i, newurl := range newUrls {
+	for _, newurl := range newUrls {
 		if s.checkVisited(newurl) == false {
-			fmt.Println(i)
-			go s.Crawl(newurl, channelDone, channelBody)
+			wg.Add(1)
+			go func(url string, channelBody chan *html.Node, wg *sync.WaitGroup) {
+				defer wg.Done()
+				s.Crawl(newurl, channelBody, wg)
+			}(newurl, channelBody, wg)
+			SLEEPER()
 		}
 	}
+
+	return
 }
 
 func (s *Spider) getPagination(node *html.Node) []string {

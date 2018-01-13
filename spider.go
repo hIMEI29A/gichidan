@@ -186,3 +186,50 @@ func (s *Spider) getPagination(node *html.Node) []string {
 
 	return links
 }
+
+/*func (s *Spider) Crawl(channelUrl chan string) chan *html.Node {
+	channelBody := make(chan *html.Node)
+	url := <-chanUrl
+
+	body := getContents(url)
+
+	if checkResult(body) == false {
+		err := errors.New("Nothing found there, Neo!")
+		ErrFatal(err)
+	}
+
+	channelBody <- body
+
+	return channelBody
+}
+
+func (s *Spider) getPagination(channelNode chan *html.Node) chan []string {
+	var links []string
+	channelUrls := make(chan []string)
+
+	node := <-channelNode
+
+	pagination := findEntry(node, PAGINATION)
+
+	if pagination != nil {
+		hrefs := findEntrys(pagination, LINK)
+
+		for _, newtag := range hrefs {
+			if htmlquery.InnerText(newtag) != "Previous" &&
+				htmlquery.InnerText(newtag) != "Next" &&
+				htmlquery.InnerText(newtag) != "1" {
+				link := requestProvider(getHref(newtag))
+
+				//				if s.checkVisited(link) == false {
+				links = append(links, link)
+				//				}
+			}
+		}
+	} else {
+		fmt.Println("No more pages")
+	}
+
+	channelUrls <- links
+
+	return channelUrls
+}*/

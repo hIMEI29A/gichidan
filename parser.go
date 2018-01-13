@@ -36,6 +36,8 @@ const (
 	H3                    = "//h3"
 	VERSION               = "//small"
 	NONE                  = " "
+	CURRENT               = "//em[@class='current']"
+	DISABLED              = "//span[@class='next_page disabled']"
 	SEARCHRESULT          = "//div[@class='search-results']"
 	PAGINATION            = "//div[@class='pagination']"
 	DETAILS               = "//a[@class='details']"
@@ -52,6 +54,8 @@ const (
 	PORT                  = "//div[@class='port']"
 	PROTO                 = "//div[@class='protocol']"
 	STATE                 = "//div[@class='state']"
+	PREVIOUS              = "← Previous"
+	NEXT                  = "Next →"
 )
 
 // Parser is a html and xpath parser

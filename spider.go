@@ -148,20 +148,33 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGro
 	return
 }
 
+func (s *Spider) checkDone(node *html.Node) bool {
+	check := false
+
+	pagination := findEntry(node, PAGINATION)
+
+	if findEntry(pagination, DISABLED) != nil {
+		check = true
+	}
+
+	return check
+}
+
 func (s *Spider) getPagination(node *html.Node) []string {
 	var links []string
 
 	pagination := findEntry(node, PAGINATION)
 
 	if pagination != nil {
+		current := toInt(getTag(pagination, CURRENT))
+		fmt.Println(current)
 		hrefs := findEntrys(pagination, LINK)
 
 		for _, newtag := range hrefs {
-			if htmlquery.InnerText(newtag) != "Previous" &&
-				htmlquery.InnerText(newtag) != "Next" &&
-				htmlquery.InnerText(newtag) != "1" {
+			if htmlquery.InnerText(newtag) != PREVIOUS &&
+				htmlquery.InnerText(newtag) != NEXT &&
+				toInt(htmlquery.InnerText(newtag)) > current {
 				link := requestProvider(getHref(newtag))
-
 				//				if s.checkVisited(link) == false {
 				links = append(links, link)
 				//				}

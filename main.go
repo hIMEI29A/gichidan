@@ -123,7 +123,6 @@ func main() {
 	}
 
 	request := requestProvider(*requestFlag)
-	//fmt.Println(request)
 
 	channelBody := make(chan *html.Node, 120)
 
@@ -132,10 +131,10 @@ func main() {
 
 	s := NewSpider(request)
 	p := NewParser(request)
-	//fmt.Println(request)
 
 	go s.Crawl(request, channelBody, wg)
 
+	//func() {
 	for {
 		recievedNode := <-channelBody
 		newHosts := p.parseOne(recievedNode)

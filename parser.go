@@ -23,41 +23,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Usefull string constants for html parsing
-const (
-	ADDED          string = "Added on "
-	DELIM                 = "]===================================================[\n"
-	LONGFORM              = "2017-09-09 01:30:35 UTC"
-	PRE                   = "//pre"
-	SPAN                  = "//span"
-	LINK                  = "//a"
-	HREF                  = "href"
-	H2                    = "//h2"
-	H3                    = "//h3"
-	VERSION               = "//small"
-	NONE                  = " "
-	CURRENT               = "//em[@class='current']"
-	DISABLED              = "//span[@class='next_page disabled']"
-	SEARCHRESULT          = "//div[@class='search-results']"
-	PAGINATION            = "//div[@class='pagination']"
-	DETAILS               = "//a[@class='details']"
-	SUMMARY               = "//div[@class='search-result-summary col-xs-4']"
-	ONION                 = "//div[@class='onion']"
-	TOTALR                = "//div[@class='bignumber']"
-	SERVICE               = "//div[@class='service']"
-	SERVICES              = "//div[@class='services']"
-	SERVICELONG           = "//li[@class='service service-long']"
-	SERVICEDETAILS        = "//div[@class='service-details col-sm-2']"
-	HOST                  = "//div[@class='search-result row-fluid']"
-	NORESULT              = "//div[@class='msg alert alert-info']"
-	RESULT                = "//div[@class='col-sm-9']"
-	PORT                  = "//div[@class='port']"
-	PROTO                 = "//div[@class='protocol']"
-	STATE                 = "//div[@class='state']"
-	PREVIOUS              = "← Previous"
-	NEXT                  = "Next →"
-)
-
 // Parser is a html and xpath parser
 type Parser struct {
 	// Spider is an asynch urls handler
@@ -106,7 +71,7 @@ func (s *Parser) checkPage(node *html.Node) bool {
 
 func (p *Parser) parseOne(node *html.Node) []*Host {
 	var hosts []*Host
-
+	//go func(node *html.Node) {
 	hostsNodes := p.getHosts(node)
 
 	for _, h := range hostsNodes {
@@ -115,7 +80,10 @@ func (p *Parser) parseOne(node *html.Node) []*Host {
 
 		detailslink := getHref(findEntry(h, DETAILS))
 		req := requestProvider(detailslink)
-		dnode := getContents(req)
+
+		chanNode := getContents(req)
+		dnode := <-chanNode
+
 		srvNodes := findEntrys(dnode, SERVICELONG)
 
 		for _, srv := range srvNodes {
@@ -127,7 +95,7 @@ func (p *Parser) parseOne(node *html.Node) []*Host {
 		host := NewHost(fields, services)
 		hosts = append(hosts, host)
 	}
-
+	//}(node)
 	return hosts
 }
 

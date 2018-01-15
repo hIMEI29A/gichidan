@@ -21,17 +21,10 @@ import (
 	"net"
 	"strings"
 	"sync"
-	//"time"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/hIMEI29A/gotorsocks"
 	"golang.org/x/net/html"
-)
-
-// Consts for connecting to search engine
-const (
-	ICHIDAN string = "ichidanv34wrx7m7.onion:80"
-	SEARCH         = "/search?query="
 )
 
 // Spider is an async urls handler
@@ -42,6 +35,7 @@ type Spider struct {
 	HandledUrls []string
 }
 
+// NewSpider is a constructor for Spider
 func NewSpider(url string) *Spider {
 	var handled []string
 	spider := &Spider{url, handled}
@@ -49,6 +43,7 @@ func NewSpider(url string) *Spider {
 	return spider
 }
 
+// requestProvider creates GET request with given string
 func requestProvider(request string) string {
 	var fullRequest string
 
@@ -70,32 +65,37 @@ func requestProvider(request string) string {
 	return fullRequest
 }
 
-func connectProvider(url string) net.Conn {
+// connectProvider provides connect to Ichidan with gotorsocks package
+func connectProvider() net.Conn {
 	tor, err := gotorsocks.NewTorGate()
 	ErrFatal(err)
 
-	connect, err := tor.DialTor(url)
+	connect, err := tor.DialTor(ICHIDAN)
 	ErrFatal(err)
 
 	return connect
 }
 
-// getContents makes request to search engine and gets response body
-func getContents(request string) *html.Node {
-	connect := connectProvider(ICHIDAN)
-	defer connect.Close()
+// getContents makes request to Ichidan search engine and gets response body
+func getContents(request string) chan *html.Node {
+	chanNode := make(chan *html.Node)
+	go func() {
+		connect := connectProvider()
+		defer connect.Close()
 
-	fmt.Fprintf(connect, request)
-	resp := bufio.NewReader(connect)
+		fmt.Fprintf(connect, request)
+		resp := bufio.NewReader(connect)
 
-	node, err := htmlquery.Parse(resp)
-	ErrFatal(err)
+		node, err := htmlquery.Parse(resp)
+		ErrFatal(err)
+		chanNode <- node
+	}()
 
-	return node
+	return chanNode
 }
 
 // CheckResult controls empty search results
-func checkResult(node *html.Node) bool {
+func (s *Spider) checkResult(node *html.Node) bool {
 	ch := true
 
 	result := findEntry(node, NORESULT)
@@ -106,6 +106,30 @@ func checkResult(node *html.Node) bool {
 	return ch
 }
 
+// checkDone checks last pagination's page
+func (s *Spider) checkDone(node *html.Node) bool {
+	check := false
+
+	pagination := findEntry(node, PAGINATION)
+
+	if findEntry(pagination, DISABLED) != nil {
+		check = true
+	}
+
+	return check
+}
+
+func (s *Spider) checkSingle(node *html.Node) bool {
+	check := true
+
+	if findEntry(node, PAGINATION) == nil {
+		check = false
+	}
+
+	return check
+}
+
+// checkVisited checks urls already processed
 func (s *Spider) checkVisited(url string) bool {
 	check := false
 
@@ -119,18 +143,20 @@ func (s *Spider) checkVisited(url string) bool {
 	return check
 }
 
+// Crawl is a async crawler that takes request as first argument, gets it content
+// and sends it to channel given as second argument
 func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGroup) {
+	chanNode := getContents(url)
+	body := <-chanNode
 
-	body := getContents(url)
-
-	if checkResult(body) == false {
-		err := errors.New("Nothing found there, Neo!")
+	if s.checkResult(body) == false {
+		errString := BOLD + RED + "Nothing found there, Neo!" + RESET
+		err := errors.New(errString)
 		ErrFatal(err)
 	}
 
 	channelBody <- body
 	s.HandledUrls = append(s.HandledUrls, url)
-	fmt.Println("Handled ", url)
 
 	newUrls := s.getPagination(body)
 
@@ -148,18 +174,8 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGro
 	return
 }
 
-func (s *Spider) checkDone(node *html.Node) bool {
-	check := false
-
-	pagination := findEntry(node, PAGINATION)
-
-	if findEntry(pagination, DISABLED) != nil {
-		check = true
-	}
-
-	return check
-}
-
+// getPagination finds pagination <div> and gets all links from there.
+// Also it checks for single-paged result
 func (s *Spider) getPagination(node *html.Node) []string {
 	var links []string
 
@@ -181,55 +197,9 @@ func (s *Spider) getPagination(node *html.Node) []string {
 			}
 		}
 	} else {
-		fmt.Println("No more pages")
+		msgString := BOLD + GRN + "Only one pages" + RESET
+		fmt.Println(msgString)
 	}
 
 	return links
 }
-
-/*func (s *Spider) Crawl(channelUrl chan string) chan *html.Node {
-	channelBody := make(chan *html.Node)
-	url := <-chanUrl
-
-	body := getContents(url)
-
-	if checkResult(body) == false {
-		err := errors.New("Nothing found there, Neo!")
-		ErrFatal(err)
-	}
-
-	channelBody <- body
-
-	return channelBody
-}
-
-func (s *Spider) getPagination(channelNode chan *html.Node) chan []string {
-	var links []string
-	channelUrls := make(chan []string)
-
-	node := <-channelNode
-
-	pagination := findEntry(node, PAGINATION)
-
-	if pagination != nil {
-		hrefs := findEntrys(pagination, LINK)
-
-		for _, newtag := range hrefs {
-			if htmlquery.InnerText(newtag) != "Previous" &&
-				htmlquery.InnerText(newtag) != "Next" &&
-				htmlquery.InnerText(newtag) != "1" {
-				link := requestProvider(getHref(newtag))
-
-				//				if s.checkVisited(link) == false {
-				links = append(links, link)
-				//				}
-			}
-		}
-	} else {
-		fmt.Println("No more pages")
-	}
-
-	channelUrls <- links
-
-	return channelUrls
-}*/

@@ -19,13 +19,7 @@ import (
 	//"time"
 )
 
-// TOPS is a slice of string constants represents <h6> tags from Ichidan search result
-//var TOPS = []string{
-//	TOPSERVICES,
-//	TOPSOFT,
-//	TOPSYS,
-//}
-
+// Host struct is a basic data type
 type Host struct {
 	// HostUrl is an url of host
 	HostUrl string
@@ -35,6 +29,7 @@ type Host struct {
 	Services []*Service
 }
 
+// Service contains all info about found Host
 type Service struct {
 	Name        string
 	Port        string
@@ -44,23 +39,27 @@ type Service struct {
 	ServDetails string
 }
 
+// NewService is a constructor for Service struct
 func NewService(fields []string) *Service {
 	service := &Service{fields[0], fields[1], fields[2], fields[3], fields[4], fields[5]}
 
 	return service
 }
 
+// NewHost is a constructor for Host struct
 func NewHost(fields []string, services []*Service) *Host {
 	host := &Host{fields[0], fields[1], services}
 
 	return host
 }
 
+// String is a Stringer implementation for Service to output
 func (s *Service) String() string {
 	return fmt.Sprintf("%s\n %s\n %s\n %s\n %s\n %s\n",
 		s.Name, s.Port, s.Protocol, s.State, s.Version, s.ServDetails)
 }
 
+// String is a Stringer implementation for Host to output
 func (h *Host) String() string {
 	var servs string
 

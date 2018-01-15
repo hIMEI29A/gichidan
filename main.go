@@ -24,23 +24,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-const (
-	RED   string = "\x1B[31m"
-	GRN          = "\x1B[32m"
-	YEL          = "\x1B[33m"
-	BLU          = "\x1B[34m"
-	MAG          = "\x1B[35m"
-	CYN          = "\x1B[36m"
-	WHT          = "\x1B[97m"
-	RESET        = "\x1B[0m"
-	BOLD         = "\x1B[1m"
-	LINE         = "\x1B[4m"
-	INV          = "\x1B[7m"
-	ITAL         = "\x1B[3m"
-)
-
-var gichidan *Gichidan
-
 // getVersion parses git to get current app's version
 func getVersion() func() string {
 	return func() string {
@@ -63,13 +46,6 @@ func toFile(filename string, output []*Host) {
 	}
 }
 */
-
-// Gichidan represents main app type
-type Gichidan struct {
-	Host
-	Spider
-	Parser
-}
 
 func main() {
 	var (
@@ -134,21 +110,34 @@ func main() {
 
 	go s.Crawl(request, channelBody, wg)
 
-	//func() {
 	for {
 		recievedNode := <-channelBody
 		newHosts := p.parseOne(recievedNode)
 
+		urlStr := BOLD + YEL + "Collected hosts: " + RESET
+		fmt.Println(urlStr)
+
 		for _, h := range newHosts {
 			parsedHosts = append(parsedHosts, h)
-			fmt.Println("added", h.HostUrl)
+			fmt.Println(h.HostUrl)
 		}
 
 		wg.Wait()
 
-		for _, m := range parsedHosts {
-			fmt.Println(m.String())
+		if s.checkSingle(recievedNode) != false {
+			if s.checkDone(recievedNode) == true {
+				fmt.Println(BOLD, GRN, "finished", RESET)
+				break
+			}
+		} else {
+			fmt.Println(BOLD, GRN, "finished", RESET)
+			break
 		}
+
 	}
-	//close(channelBody)
+
+	fmt.Println(BOLD, RED, "Full info:\n", RESET)
+	for _, m := range parsedHosts {
+		fmt.Println(m.String())
+	}
 }

@@ -18,22 +18,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 	"sync"
 
 	"golang.org/x/net/html"
 )
-
-// getVersion parses git to get current app's version
-func getVersion() func() string {
-	return func() string {
-		getVerCmd := exec.Command("git", "describe", "--tags")
-		getVerOut, err := getVerCmd.Output()
-		ErrFatal(err)
-
-		return string(getVerOut)
-	}
-}
 
 /*
 func toFile(filename string, output []*Host) {
@@ -54,8 +42,8 @@ func main() {
 		requestFlag = searchCmd.String("r", "", "your search request to Ichidan")
 
 		// Version flag gets current app's version
-		version    = getVersion()
-		versionCmd = flag.Bool("v", false, "print current version")
+		version    = "0.1.0"
+		versionCmd = flag.Bool("v", false, "\tprints current version")
 
 		//toFileCmd = flag.String("f", "", "save output to file")
 
@@ -63,19 +51,24 @@ func main() {
 		usage = func() {
 			fmt.Println(BOLD, RED, "\t", "Usage:", RESET)
 			fmt.Println(WHT, "\t", "gichidan <command> [<args>] [options]")
-			fmt.Println("\t\t", BLU, "Commands:", GRN, "\t", "search")
-			fmt.Println("\t\t", BLU, "Args:", GRN, "\t", "-r", "\t", "your search request to Ichidan")
-			fmt.Println("\t\t", BLU, "Options:", GRN, "\t", "-v", "\t", "app's current version")
-			fmt.Println("\t\t\t\t", "-h", "\t", "prints this message", RESET)
-			fmt.Println("\n")
+			fmt.Println(BLU, "Commands:", GRN, "\t", "search")
+			fmt.Println(BLU, "Args:", GRN, "\t", "-r", "\t", CYN, "your search request to Ichidan")
+			fmt.Println(BLU, "Options:\n", GRN, "\t\t")
 		}
+
+		// helpCmd prints usage()
+		helpCmd = flag.Bool("h", false, "\thelp message")
 	)
 
 	flag.Parse()
 
 	if *versionCmd {
-		fmt.Println(version())
+		fmt.Println(version)
 		os.Exit(1)
+	}
+
+	if *helpCmd {
+		usage()
 	}
 
 	if len(os.Args) < 2 {
@@ -114,8 +107,7 @@ func main() {
 		recievedNode := <-channelBody
 		newHosts := p.parseOne(recievedNode)
 
-		urlStr := BOLD + YEL + "Collected hosts: " + RESET
-		fmt.Println(urlStr)
+		fmt.Println(BOLD, YEL, "Collected hosts: ", RESET)
 
 		for _, h := range newHosts {
 			parsedHosts = append(parsedHosts, h)

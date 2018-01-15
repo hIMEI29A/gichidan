@@ -197,8 +197,7 @@ func (s *Spider) getPagination(node *html.Node) []string {
 			}
 		}
 	} else {
-		msgString := BOLD + GRN + "Only one pages" + RESET
-		fmt.Println(msgString)
+		fmt.Println(BOLD, GRN, "Only one pages", RESET)
 	}
 
 	return links

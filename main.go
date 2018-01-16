@@ -15,51 +15,68 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
+	"path"
 	"sync"
 
 	"golang.org/x/net/html"
 )
 
-/*
-func toFile(filename string, output []*Host) {
-	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE, 0666)
+var (
+	// "Search" subcommand
+	searchCmd   = flag.NewFlagSet("search", flag.ExitOnError)
+	requestFlag = searchCmd.String("r", "", "your search request to Ichidan")
+	// Save output to file
+	outputFlag = searchCmd.String("f", "", "save results to file")
+	PARSED     []*Host
+	FILEPATH   string
+
+	// Version flag gets current app's version
+	version    = "0.1.0"
+	versionCmd = flag.Bool("v", false, "\tprint current version")
+
+	// usage prints short help message
+	usage = func() {
+		fmt.Println(BOLD, RED, "\t", "Usage:", RESET)
+		fmt.Println(WHT, "\t", "gichidan <command> [<args>] [options]")
+		fmt.Println(BLU, "Commands:", GRN, "\t", "search")
+		fmt.Println(BLU, "Args:", GRN, "\t", "-r", "\t", CYN, "your search request to Ichidan")
+		fmt.Println(BLU, "Options:\n", GRN, "\t\t")
+	}
+
+	// helpCmd prints usage()
+	helpCmd = flag.Bool("h", false, "\thelp message")
+)
+
+func toFile(filepath string, parsed []*Host) {
+	dir := path.Dir(filepath)
+
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		errString := BOLD + RED + "Given path does not exist" + RESET
+		newerr := errors.New(errString)
+		ErrFatal(newerr)
+	}
+
+	if _, err := os.Stat(filepath); os.IsExist(err) {
+		errString := BOLD + RED + "File already exist, we'll not rewrite it " + RESET
+		newerr := errors.New(errString)
+		ErrFatal(newerr)
+	}
+
+	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE, 0666)
 	ErrFatal(err)
 	defer file.Close()
 
-	for _, s := range output {
+	for i, s := range parsed {
 		file.WriteString(s.String() + "\n\n\n")
+		fmt.Println(i)
 	}
 }
-*/
 
 func main() {
-	var (
-		// "Search" subcommand
-		searchCmd   = flag.NewFlagSet("search", flag.ExitOnError)
-		requestFlag = searchCmd.String("r", "", "your search request to Ichidan")
-
-		// Version flag gets current app's version
-		version    = "0.1.0"
-		versionCmd = flag.Bool("v", false, "\tprints current version")
-
-		//toFileCmd = flag.String("f", "", "save output to file")
-
-		// usage prints short help message
-		usage = func() {
-			fmt.Println(BOLD, RED, "\t", "Usage:", RESET)
-			fmt.Println(WHT, "\t", "gichidan <command> [<args>] [options]")
-			fmt.Println(BLU, "Commands:", GRN, "\t", "search")
-			fmt.Println(BLU, "Args:", GRN, "\t", "-r", "\t", CYN, "your search request to Ichidan")
-			fmt.Println(BLU, "Options:\n", GRN, "\t\t")
-		}
-
-		// helpCmd prints usage()
-		helpCmd = flag.Bool("h", false, "\thelp message")
-	)
-
 	flag.Parse()
 
 	if *versionCmd {
@@ -89,6 +106,10 @@ func main() {
 			usage()
 			os.Exit(1)
 		}
+
+		if *outputFlag != "" {
+			FILEPATH = *outputFlag
+		}
 	}
 
 	request := requestProvider(*requestFlag)
@@ -98,8 +119,8 @@ func main() {
 	var parsedHosts []*Host
 	wg := &sync.WaitGroup{}
 
-	s := NewSpider(request)
-	p := NewParser(request)
+	s := NewSpider()
+	p := NewParser()
 
 	go s.Crawl(request, channelBody, wg)
 
@@ -132,4 +153,11 @@ func main() {
 	for _, m := range parsedHosts {
 		fmt.Println(m.String())
 	}
+
+	if FILEPATH != "" {
+		fmt.Println(FILEPATH)
+		PARSED = parsedHosts
+		toFile(FILEPATH, PARSED)
+	}
+
 }

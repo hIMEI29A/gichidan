@@ -38,7 +38,7 @@ const (
 	ITAL         = "\x1B[3m"
 )
 
-// Connecting to search engine
+// Connect to search engine
 const (
 	ICHIDAN string = "ichidanv34wrx7m7.onion:80"
 	SEARCH         = "/search?query="
@@ -100,6 +100,9 @@ func trimString(str string) string {
 	return strings.TrimSpace(str)
 }
 
+// Sleeper is a closure which calls time.Sleep with random time
+// range between 300 and 359 milliseconds. It will be used in spider.Crawl() to avoid
+// highly load to Ichidan server.
 func sleeper() func() {
 	return func() {
 		s := rand.NewSource(time.Now().UnixNano())

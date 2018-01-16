@@ -29,16 +29,14 @@ import (
 
 // Spider is an async urls handler
 type Spider struct {
-	// Urls to crawl
-	Url string
 	// Urls already being handled
 	HandledUrls []string
 }
 
 // NewSpider is a constructor for Spider
-func NewSpider(url string) *Spider {
+func NewSpider() *Spider {
 	var handled []string
-	spider := &Spider{url, handled}
+	spider := &Spider{handled}
 
 	return spider
 }
@@ -174,7 +172,7 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGro
 	return
 }
 
-// getPagination finds pagination <div> and gets all links from there.
+// getPagination finds pagination <div> and gets all links from it.
 // Also it checks for single-paged result
 func (s *Spider) getPagination(node *html.Node) []string {
 	var links []string

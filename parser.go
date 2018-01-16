@@ -15,8 +15,6 @@
 package main
 
 import (
-	//"errors"
-	//"fmt"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
@@ -25,13 +23,10 @@ import (
 
 // Parser is a html and xpath parser
 type Parser struct {
-	// Spider is an asynch urls handler
-	Spider
-	//	Hosts   []*Host
 }
 
 // NewParser creates instance of Parser
-func NewParser(request string) *Parser {
+func NewParser() *Parser {
 	parser := &Parser{}
 
 	return parser
@@ -69,9 +64,9 @@ func (s *Parser) checkPage(node *html.Node) bool {
 	return ch
 }
 
+// parseOne parses given *html.Node and creates slice of *Host
 func (p *Parser) parseOne(node *html.Node) []*Host {
 	var hosts []*Host
-	//go func(node *html.Node) {
 	hostsNodes := p.getHosts(node)
 
 	for _, h := range hostsNodes {
@@ -99,6 +94,8 @@ func (p *Parser) parseOne(node *html.Node) []*Host {
 	return hosts
 }
 
+// getHostFields collects all data for Host struct creating
+// and returns it as []string
 func (p *Parser) getHostFields(node *html.Node) []string {
 	var fields []string
 
@@ -111,6 +108,8 @@ func (p *Parser) getHostFields(node *html.Node) []string {
 	return fields
 }
 
+// getServiceFields collects all data for Service struct creating
+// and returns it as []string
 func (p *Parser) getServiceFields(node *html.Node) []string {
 	var fields []string
 

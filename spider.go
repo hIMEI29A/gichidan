@@ -159,14 +159,14 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGro
 	newUrls := s.getPagination(body)
 
 	for _, newurl := range newUrls {
-		if s.checkVisited(newurl) == false {
-			wg.Add(1)
-			go func(url string, channelBody chan *html.Node, wg *sync.WaitGroup) {
-				defer wg.Done()
-				s.Crawl(newurl, channelBody, wg)
-			}(newurl, channelBody, wg)
-			SLEEPER()
-		}
+		//if s.checkVisited(newurl) == false {
+		wg.Add(1)
+		go func(url string, channelBody chan *html.Node, wg *sync.WaitGroup) {
+			defer wg.Done()
+			s.Crawl(newurl, channelBody, wg)
+		}(newurl, channelBody, wg)
+		SLEEPER()
+		//}
 	}
 
 	return
@@ -189,9 +189,10 @@ func (s *Spider) getPagination(node *html.Node) []string {
 				htmlquery.InnerText(newtag) != NEXT &&
 				toInt(htmlquery.InnerText(newtag)) > current {
 				link := requestProvider(getHref(newtag))
-				//				if s.checkVisited(link) == false {
-				links = append(links, link)
-				//				}
+
+				if s.checkVisited(link) == false {
+					links = append(links, link)
+				}
 			}
 		}
 	} else {

@@ -78,7 +78,7 @@ func toFile(filepath string, parsed []*Host) {
 }
 
 func main() {
-	// Cli options parsing
+	// Cli options parsing ///////////////////////////
 	flag.Parse()
 
 	if *versionCmd {
@@ -116,9 +116,10 @@ func main() {
 
 	request := requestProvider(*requestFlag)
 
-	var parsedHosts []*Host
-	var recievedNodes []*html.Node
-	var mu = &sync.Mutex{}
+	var (
+		parsedHosts []*Host
+		mutex       = &sync.Mutex{}
+	)
 
 	// Channels
 	channelBody := make(chan *html.Node, BUFFSIZE)
@@ -131,6 +132,7 @@ func main() {
 
 	totalHosts := 1
 
+	// Start crawling ////////////////////////////////
 	go s.Crawl(request, channelBody)
 
 	for len(parsedHosts) < totalHosts {
@@ -145,33 +147,34 @@ func main() {
 
 			go s.getPagination(recievedNode, chanUrls)
 			go p.parseOne(recievedNode, chanHost)
-			recievedNodes = append(recievedNodes, recievedNode)
 
 		case newUrl := <-chanUrls:
-			mu.Lock()
+			// Firstly check if link was visited
+			mutex.Lock()
 			if s.HandledUrls[newUrl] == false {
 				go s.Crawl(newUrl, channelBody)
 				s.HandledUrls[newUrl] = true
 				SLEEPER()
-				fmt.Println(newUrl, " in processing")
+				fmt.Println(BOLD, CYN, newUrl, YEL, " in processing", RESET)
 			} else {
-				//fmt.Println(BOLD, RED, newUrl, "Already visited", RESET)
 			}
-			mu.Unlock()
+			mutex.Unlock()
 
 		case newhosts := <-chanHost:
 			for _, h := range newhosts {
 				parsedHosts = append(parsedHosts, h)
-				fmt.Println("parsed ", h.HostUrl)
+				fmt.Println(BOLD, YEL, "parsed ", CYN, h.HostUrl)
 			}
 		}
 	}
 
+	// Results output ///////////////////////////////////
 	fmt.Println(BOLD, RED, "Full info:\n", RESET)
 	for _, m := range parsedHosts {
-		fmt.Println(m.String())
+		fmt.Println(BOLD, GRN, m.String(), RESET)
 	}
 
+	// Save results to file if flag parsed //////////////
 	if FILEPATH != "" {
 		fmt.Println(FILEPATH)
 		PARSED = parsedHosts

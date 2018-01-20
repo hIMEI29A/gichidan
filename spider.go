@@ -41,7 +41,7 @@ func NewSpider() *Spider {
 	return spider
 }
 
-// requestProvider creates GET request with given string
+// RequestProvider creates GET request with given string
 func requestProvider(request string) string {
 	var fullRequest string
 
@@ -63,7 +63,7 @@ func requestProvider(request string) string {
 	return fullRequest
 }
 
-// connectProvider provides connect to Ichidan with gotorsocks package
+// ConnectProvider provides connect to Ichidan with gotorsocks package
 func connectProvider() net.Conn {
 	tor, err := gotorsocks.NewTorGate()
 	ErrFatal(err)
@@ -74,7 +74,7 @@ func connectProvider() net.Conn {
 	return connect
 }
 
-// getContents makes request to Ichidan search engine and gets response body
+// GetContents makes request to Ichidan search engine and gets response body
 func getContents(request string) chan *html.Node {
 	chanNode := make(chan *html.Node)
 	go func() {
@@ -92,6 +92,7 @@ func getContents(request string) chan *html.Node {
 	return chanNode
 }
 
+// GetTotal gets results total number
 func (s *Spider) getTotal(root *html.Node) string {
 	total := trimString(getTag(root, TOTAL))
 
@@ -110,6 +111,7 @@ func (s *Spider) checkResult(node *html.Node) bool {
 	return ch
 }
 
+// CheckRoot checks if given page is first or single page
 func (s *Spider) checkRoot(node *html.Node) bool {
 	check := false
 
@@ -120,7 +122,7 @@ func (s *Spider) checkRoot(node *html.Node) bool {
 	return check
 }
 
-// checkDone checks last pagination's page
+// CheckDone checks last pagination's page
 func (s *Spider) checkDone(node *html.Node) bool {
 	check := false
 
@@ -133,22 +135,12 @@ func (s *Spider) checkDone(node *html.Node) bool {
 	return check
 }
 
+// CheckSingle checks if given page is single (have not pagination)
 func (s *Spider) checkSingle(node *html.Node) bool {
 	check := true
 
 	if findEntry(node, PAGINATION) == nil {
 		check = false
-	}
-
-	return check
-}
-
-// checkVisited checks urls already processed
-func (s *Spider) checkVisited(url string) bool {
-	check := false
-
-	if s.HandledUrls[url] == true {
-		check = true
 	}
 
 	return check
@@ -171,14 +163,13 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node /*, wg *sync.Wait
 	return
 }
 
-// getPagination finds pagination <div> and gets all links from it.
+// GetPagination finds pagination <div> and gets all links from it.
 // Also it checks for single-paged result
 func (s *Spider) getPagination(node *html.Node, chanUrls chan string) {
 	pagination := findEntry(node, PAGINATION)
 
 	if pagination != nil {
 		current := toInt(getTag(pagination, CURRENT))
-		//fmt.Println(current)
 		hrefs := findEntrys(pagination, LINK)
 
 		for _, newtag := range hrefs {

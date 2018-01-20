@@ -65,7 +65,7 @@ func (s *Parser) checkPage(node *html.Node) bool {
 }
 
 // parseOne parses given *html.Node and creates slice of *Host
-func (p *Parser) parseOne(node *html.Node) []*Host {
+func (p *Parser) parseOne(node *html.Node, chanHost chan []*Host) {
 	var hosts []*Host
 	hostsNodes := p.getHosts(node)
 
@@ -90,8 +90,10 @@ func (p *Parser) parseOne(node *html.Node) []*Host {
 		host := NewHost(fields, services)
 		hosts = append(hosts, host)
 	}
-	//}(node)
-	return hosts
+
+	chanHost <- hosts
+
+	return
 }
 
 // getHostFields collects all data for Host struct creating

@@ -51,6 +51,7 @@ var (
 	helpCmd = flag.Bool("h", false, "\thelp message")
 )
 
+// ToFile saves results to given file
 func toFile(filepath string, parsed []*Host) {
 	dir := path.Dir(filepath)
 
@@ -77,6 +78,7 @@ func toFile(filepath string, parsed []*Host) {
 }
 
 func main() {
+	// Cli options parsing
 	flag.Parse()
 
 	if *versionCmd {
@@ -114,39 +116,55 @@ func main() {
 
 	request := requestProvider(*requestFlag)
 
-	channelBody := make(chan *html.Node, 120)
-
 	var parsedHosts []*Host
-	wg := &sync.WaitGroup{}
+	var recievedNodes []*html.Node
+	var mu = &sync.Mutex{}
 
+	// Channels
+	channelBody := make(chan *html.Node, BUFFSIZE)
+	chanUrls := make(chan string, BUFFSIZE)
+	chanHost := make(chan []*Host, BUFFSIZE)
+
+	// Actors
 	s := NewSpider()
 	p := NewParser()
 
-	go s.Crawl(request, channelBody, wg)
+	totalHosts := 1
 
-	for {
-		recievedNode := <-channelBody
-		newHosts := p.parseOne(recievedNode)
+	go s.Crawl(request, channelBody)
 
-		fmt.Println(BOLD, YEL, "Collected hosts: ", RESET)
-
-		for _, h := range newHosts {
-			parsedHosts = append(parsedHosts, h)
-			fmt.Println(h.HostUrl)
-		}
-
-		wg.Wait()
-
-		if s.checkSingle(recievedNode) != false {
-			if s.checkDone(recievedNode) == true {
-				fmt.Println(BOLD, GRN, "finished", RESET)
-				break
+	for len(parsedHosts) < totalHosts {
+		select {
+		case recievedNode := <-channelBody:
+			if s.checkRoot(recievedNode) == true {
+				// Get results total number
+				total := s.getTotal(recievedNode)
+				totalHosts = toInt(total)
+				fmt.Println(BOLD, YEL, "Hosts found: ", CYN, total, RESET)
 			}
-		} else {
-			fmt.Println(BOLD, GRN, "finished", RESET)
-			break
-		}
 
+			go s.getPagination(recievedNode, chanUrls)
+			go p.parseOne(recievedNode, chanHost)
+			recievedNodes = append(recievedNodes, recievedNode)
+
+		case newUrl := <-chanUrls:
+			mu.Lock()
+			if s.HandledUrls[newUrl] == false {
+				go s.Crawl(newUrl, channelBody)
+				s.HandledUrls[newUrl] = true
+				SLEEPER()
+				fmt.Println(newUrl, " in processing")
+			} else {
+				//fmt.Println(BOLD, RED, newUrl, "Already visited", RESET)
+			}
+			mu.Unlock()
+
+		case newhosts := <-chanHost:
+			for _, h := range newhosts {
+				parsedHosts = append(parsedHosts, h)
+				fmt.Println("parsed ", h.HostUrl)
+			}
+		}
 	}
 
 	fmt.Println(BOLD, RED, "Full info:\n", RESET)

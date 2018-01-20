@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"sync"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/hIMEI29A/gotorsocks"
@@ -30,13 +29,14 @@ import (
 // Spider is an async urls handler
 type Spider struct {
 	// Urls already being handled
-	HandledUrls []string
+	HandledUrls map[string]bool
 }
 
 // NewSpider is a constructor for Spider
 func NewSpider() *Spider {
-	var handled []string
-	spider := &Spider{handled}
+	handled := make(map[string]bool)
+	spider := &Spider{}
+	spider.HandledUrls = handled
 
 	return spider
 }
@@ -92,6 +92,12 @@ func getContents(request string) chan *html.Node {
 	return chanNode
 }
 
+func (s *Spider) getTotal(root *html.Node) string {
+	total := trimString(getTag(root, TOTAL))
+
+	return total
+}
+
 // CheckResult controls empty search results
 func (s *Spider) checkResult(node *html.Node) bool {
 	ch := true
@@ -102,6 +108,16 @@ func (s *Spider) checkResult(node *html.Node) bool {
 	}
 
 	return ch
+}
+
+func (s *Spider) checkRoot(node *html.Node) bool {
+	check := false
+
+	if s.checkSingle(node) == false || getTag(findEntry(node, PAGINATION), CURRENT) == "1" {
+		check = true
+	}
+
+	return check
 }
 
 // checkDone checks last pagination's page
@@ -131,11 +147,8 @@ func (s *Spider) checkSingle(node *html.Node) bool {
 func (s *Spider) checkVisited(url string) bool {
 	check := false
 
-	for _, handled := range s.HandledUrls {
-		if handled == url {
-			check = true
-			break
-		}
+	if s.HandledUrls[url] == true {
+		check = true
 	}
 
 	return check
@@ -143,7 +156,7 @@ func (s *Spider) checkVisited(url string) bool {
 
 // Crawl is a async crawler that takes request as first argument, gets it content
 // and sends it to channel given as second argument
-func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGroup) {
+func (s *Spider) Crawl(url string, channelBody chan *html.Node /*, wg *sync.WaitGroup*/) {
 	chanNode := getContents(url)
 	body := <-chanNode
 
@@ -154,34 +167,18 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node, wg *sync.WaitGro
 	}
 
 	channelBody <- body
-	s.HandledUrls = append(s.HandledUrls, url)
-
-	newUrls := s.getPagination(body)
-
-	for _, newurl := range newUrls {
-		//if s.checkVisited(newurl) == false {
-		wg.Add(1)
-		go func(url string, channelBody chan *html.Node, wg *sync.WaitGroup) {
-			defer wg.Done()
-			s.Crawl(newurl, channelBody, wg)
-		}(newurl, channelBody, wg)
-		SLEEPER()
-		//}
-	}
 
 	return
 }
 
 // getPagination finds pagination <div> and gets all links from it.
 // Also it checks for single-paged result
-func (s *Spider) getPagination(node *html.Node) []string {
-	var links []string
-
+func (s *Spider) getPagination(node *html.Node, chanUrls chan string) {
 	pagination := findEntry(node, PAGINATION)
 
 	if pagination != nil {
 		current := toInt(getTag(pagination, CURRENT))
-		fmt.Println(current)
+		//fmt.Println(current)
 		hrefs := findEntrys(pagination, LINK)
 
 		for _, newtag := range hrefs {
@@ -190,14 +187,12 @@ func (s *Spider) getPagination(node *html.Node) []string {
 				toInt(htmlquery.InnerText(newtag)) > current {
 				link := requestProvider(getHref(newtag))
 
-				if s.checkVisited(link) == false {
-					links = append(links, link)
-				}
+				chanUrls <- link
 			}
 		}
 	} else {
-		fmt.Println(BOLD, GRN, "Only one pages", RESET)
+		fmt.Println(BOLD, GRN, "Only one page", RESET)
 	}
 
-	return links
+	return
 }

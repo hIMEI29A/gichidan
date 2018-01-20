@@ -22,6 +22,9 @@ import (
 	"time"
 )
 
+// Size of buffered channel
+const BUFFSIZE int = 1200
+
 // Output colorizing
 const (
 	RED   string = "\x1B[31m"
@@ -63,7 +66,7 @@ const (
 	DETAILS               = "//a[@class='details']"
 	SUMMARY               = "//div[@class='search-result-summary col-xs-4']"
 	ONION                 = "//div[@class='onion']"
-	TOTALR                = "//div[@class='bignumber']"
+	TOTAL                 = "//div[@class='bignumber']"
 	SERVICE               = "//div[@class='service']"
 	SERVICES              = "//div[@class='services']"
 	SERVICELONG           = "//li[@class='service service-long']"

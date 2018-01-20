@@ -26,11 +26,9 @@ import (
 )
 
 var (
-	// "Search" subcommand
-	searchCmd   = flag.NewFlagSet("search", flag.ExitOnError)
-	requestFlag = searchCmd.String("r", "", "your search request to Ichidan")
+	requestFlag = flag.String("r", "", "your search request to Ichidan")
 	// Save output to file
-	outputFlag = searchCmd.String("f", "", "save results to file")
+	outputFlag = flag.String("f", "", "save results to file")
 	PARSED     []*Host
 	FILEPATH   string
 
@@ -41,7 +39,7 @@ var (
 	// usage prints short help message
 	usage = func() {
 		fmt.Println(BOLD, RED, "\t", "Usage:", RESET)
-		fmt.Println(WHT, "\t", "gichidan <command> [<args>] [options]")
+		fmt.Println(WHT, "\t", "gichidan [<args>] [options]")
 		fmt.Println(BLU, "Commands:", GRN, "\t", "search")
 		fmt.Println(BLU, "Args:", GRN, "\t", "-r", "\t", CYN, "your search request to Ichidan")
 		fmt.Println(BLU, "Options:\n", GRN, "\t\t")
@@ -67,13 +65,13 @@ func toFile(filepath string, parsed []*Host) {
 		ErrFatal(newerr)
 	}
 
-	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE, 0666)
+	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE, 0666)
 	ErrFatal(err)
 	defer file.Close()
 
-	for i, s := range parsed {
-		file.WriteString(s.String() + "\n\n\n")
-		fmt.Println(i)
+	for _, s := range parsed {
+		file.WriteString(s.String() /* + "\n\n\n"*/)
+		ErrFatal(err)
 	}
 }
 
@@ -90,28 +88,18 @@ func main() {
 		usage()
 	}
 
-	if len(os.Args) < 2 {
+	if len(os.Args) < 1 {
 		usage()
 		os.Exit(1)
 	}
 
-	switch os.Args[1] {
-	case "search":
-		searchCmd.Parse(os.Args[2:])
-	default:
-		flag.PrintDefaults()
+	if *requestFlag == "" {
+		usage()
 		os.Exit(1)
 	}
 
-	if searchCmd.Parsed() {
-		if *requestFlag == "" {
-			usage()
-			os.Exit(1)
-		}
-
-		if *outputFlag != "" {
-			FILEPATH = *outputFlag
-		}
+	if *outputFlag != "" {
+		FILEPATH = *outputFlag
 	}
 
 	request := requestProvider(*requestFlag)
@@ -122,13 +110,17 @@ func main() {
 	)
 
 	// Channels
-	channelBody := make(chan *html.Node, BUFFSIZE)
-	chanUrls := make(chan string, BUFFSIZE)
-	chanHost := make(chan []*Host, BUFFSIZE)
+	var (
+		channelBody = make(chan *html.Node, BUFFSIZE)
+		chanUrls    = make(chan string, BUFFSIZE)
+		chanHost    = make(chan []*Host, BUFFSIZE)
+	)
 
 	// Actors
-	s := NewSpider()
-	p := NewParser()
+	var (
+		s = NewSpider()
+		p = NewParser()
+	)
 
 	totalHosts := 1
 
@@ -176,7 +168,7 @@ func main() {
 
 	// Save results to file if flag parsed //////////////
 	if FILEPATH != "" {
-		fmt.Println(FILEPATH)
+		fmt.Println(BOLD, YEL, "Saved to ", CYN, FILEPATH, RESET)
 		PARSED = parsedHosts
 		toFile(FILEPATH, PARSED)
 	}

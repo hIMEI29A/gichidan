@@ -26,21 +26,22 @@ import (
 )
 
 var (
-	requestFlag = flag.String("r", "", "your search request to Ichidan")
+	requestFlag   = flag.String("r", "", "your search request to Ichidan")
+	shortInfoFlag = flag.Bool("s", false, "print hosts urls only")
+
 	// Save output to file
 	outputFlag = flag.String("f", "", "save results to file")
-	PARSED     []*Host
-	FILEPATH   string
+	Parsed     []*Host
+	Filepath   string
 
 	// Version flag gets current app's version
-	version    = "0.1.0"
-	versionCmd = flag.Bool("v", false, "\tprint current version")
+	version     = "0.1.0"
+	versionFlag = flag.Bool("v", false, "\tprint current version")
 
 	// usage prints short help message
 	usage = func() {
 		fmt.Println(BOLD, RED, "\t", "Usage:", RESET)
 		fmt.Println(WHT, "\t", "gichidan [<args>] [options]")
-		fmt.Println(BLU, "Commands:", GRN, "\t", "search")
 		fmt.Println(BLU, "Args:", GRN, "\t", "-r", "\t", CYN, "your search request to Ichidan")
 		fmt.Println(BLU, "Options:\n", GRN, "\t\t")
 	}
@@ -70,16 +71,16 @@ func toFile(filepath string, parsed []*Host) {
 	defer file.Close()
 
 	for _, s := range parsed {
-		file.WriteString(s.String() /* + "\n\n\n"*/)
+		file.WriteString(s.String() + "\n\n\n")
 		ErrFatal(err)
 	}
 }
 
 func main() {
-	// Cli options parsing ///////////////////////////
+	// Cli options parsing
 	flag.Parse()
 
-	if *versionCmd {
+	if *versionFlag {
 		fmt.Println(version)
 		os.Exit(1)
 	}
@@ -99,7 +100,7 @@ func main() {
 	}
 
 	if *outputFlag != "" {
-		FILEPATH = *outputFlag
+		Filepath = *outputFlag
 	}
 
 	request := requestProvider(*requestFlag)
@@ -107,6 +108,7 @@ func main() {
 	var (
 		parsedHosts []*Host
 		mutex       = &sync.Mutex{}
+		totalHosts  = 1
 	)
 
 	// Channels
@@ -122,9 +124,7 @@ func main() {
 		p = NewParser()
 	)
 
-	totalHosts := 1
-
-	// Start crawling ////////////////////////////////
+	// Start crawling
 	go s.Crawl(request, channelBody)
 
 	for len(parsedHosts) < totalHosts {
@@ -155,22 +155,28 @@ func main() {
 		case newhosts := <-chanHost:
 			for _, h := range newhosts {
 				parsedHosts = append(parsedHosts, h)
-				fmt.Println(BOLD, YEL, "parsed ", CYN, h.HostUrl)
 			}
 		}
 	}
 
-	// Results output ///////////////////////////////////
-	fmt.Println(BOLD, RED, "Full info:\n", RESET)
-	for _, m := range parsedHosts {
-		fmt.Println(BOLD, GRN, m.String(), RESET)
+	// Results output. If shortInfoFlag was parsed, only hosts urls will be printed.
+	if !*shortInfoFlag {
+		fmt.Println(BOLD, YEL, "Full info:\n", RESET)
+		for _, m := range parsedHosts {
+			fmt.Println(BOLD, GRN, m.String(), RESET)
+		}
+	} else {
+		fmt.Println(BOLD, YEL, "\nShort info:\n", RESET)
+		for _, m := range parsedHosts {
+			fmt.Println(BOLD, GRN, m.HostUrl, RESET)
+		}
 	}
 
-	// Save results to file if flag parsed //////////////
-	if FILEPATH != "" {
-		fmt.Println(BOLD, YEL, "Saved to ", CYN, FILEPATH, RESET)
-		PARSED = parsedHosts
-		toFile(FILEPATH, PARSED)
+	// Save results to file if flag parsed
+	if Filepath != "" {
+		fmt.Println(BOLD, YEL, "Saved to ", CYN, Filepath, RESET)
+		Parsed = parsedHosts
+		toFile(Filepath, Parsed)
 	}
 
 }

@@ -31,14 +31,10 @@ const (
 	GRN          = "\x1B[32m"
 	YEL          = "\x1B[33m"
 	BLU          = "\x1B[34m"
-	MAG          = "\x1B[35m"
 	CYN          = "\x1B[36m"
 	WHT          = "\x1B[97m"
 	RESET        = "\x1B[0m"
 	BOLD         = "\x1B[1m"
-	LINE         = "\x1B[4m"
-	INV          = "\x1B[7m"
-	ITAL         = "\x1B[3m"
 )
 
 // Connect to search engine
@@ -98,7 +94,7 @@ func ErrFatal(err error) {
 	}
 }
 
-// trimString trims trailing and leading spaces from string
+// TrimString trims trailing and leading spaces from string
 func trimString(str string) string {
 	return strings.TrimSpace(str)
 }

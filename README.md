@@ -3,12 +3,19 @@
 **gichidan** - command line wrapper to 
 (warning: _onion link_) [**Ichidan**](http://ichidanv34wrx7m7.onion) deep-web search engine with enhansed pentest features (TODO).
 
-     ____, __, ____,__, _,__, ____,____,_,  _,
-    (-/ _,(-| (-/  (-|__|(-| (-|  (-/_|(-|\ | 
-     _\__| _|_,_\__,_|  |,_|_,_|__//  |,_| \|,
-    (     (   (    (     (   (   (     (      
+      ▄████  ██▓ ▄████▄   ██░ ██  ██░░█████▄  ▄▄▄       ███▄    █ 
+     ██▒ ▀█▒▓██▒▒██▀ ▀█  ▓██░ ██▒▓██▒▒██▀ ██▌▒████▄     ██ ▀█   █ 
+    ▒██░▄▄▄░▒██▒▒▓█    ▄ ▒██▀▀██░▒██▒░██   █▌▒██  ▀█▄  ▓██  ▀█ ██▒
+    ░▓█  ██▓░██░▒▓▓▄ ▄██▒░▓█ ░██ ░██░░▓█▄   ▌░██▄▄▄▄██ ▓██▒  ▐▌██▒
+    ░▒▓███▀▒░██░▒ ▓███▀ ░░▓█▒░██▓░██░░▒████▓  ▓█   ▓██▒▒██░   ▓██░
+     ░▒   ▒ ░▓  ░ ░▒ ▒  ░ ▒ ░░▒░▒░▓   ▒▒▓  ▒  ▒▒   ▓▒█░░ ▒░   ▒ ▒ 
+      ░   ░  ▒ ░  ░  ▒    ▒ ░▒░ ░ ▒ ░ ░ ▒  ▒   ▒   ▒▒ ░░ ░░   ░ ▒░
+    ░ ░   ░  ▒ ░░         ░  ░░ ░ ▒ ░ ░ ░  ░   ░   ▒      ░   ░ ░ 
+          ░  ░  ░ ░       ░  ░  ░ ░     ░          ░  ░         ░ 
+                ░                     ░                           
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan) [![GoDoc](https://godoc.org/github.com/hIMEI29A/gichidan?status.svg)](http://godoc.org/github.com/hIMEI29A/gichidan)
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan)
 
 Copyright 2017 hIMEI
 
@@ -24,6 +31,8 @@ Copyright 2017 hIMEI
 2. Version
 3. Install
 4. Usage
+5. TODO
+6. Contributing
 
 ## About
 
@@ -38,6 +47,7 @@ Copyright 2017 hIMEI
 
 ###### Features
 
+See **Usage** section of this paper.
 
 ###### Dependencies
 
@@ -56,11 +66,19 @@ Short info about Ichidan search engine from [here](https://www.cylance.com/en_us
 
 > Ichidan is a valuable resource for security researchers and law enforcement agencies who want to learn about what's happening on the Dark Web.
 
+## Version
+
+**0.1.0**
+
 ## Install
 
 Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 
 Progect uses `glide` to manage dependencies, so install it first
+
+```sh
+curl https://glide.sh/get | sh
+```
 
 ```sh
 mkdir -p $GOPATH/src/github.com/hIMEI29A/gichidan
@@ -73,35 +91,29 @@ go install
 You may **install** Gichidan also by `go install`:
 
 ```sh
-go get github.com/hIMEI29A/gichidan
+go install github.com/hIMEI29A/gichidan
 ```
 
 ## Usage
 
-Type in your console to get help:
+Gichidan's CLI options are:
 
-```sh
-gichidan -h
-```
+    gichidan
+        -r <request>    search request (required)
+        -s              short info (only hosts urls will be printed)
+        -f <filepath>   save results to given file
+        -v              version
+        -h              help
 
-You will see next message:
+Typical request to Ichidan looks like
 
-             Usage: 
-            gichidan <command> [<args>] [options]
-    Commands:       search
-    Args:       -r  your search request to Ichidan
-    Options:
-        
-    -h        help message
-    -v        prints current version
+    gichidan -r ichidan
 
-Typical request to Ichidan may looks such as
-
-    gichidan search -r ichidan
+Output: 
 
     Hosts found:   1 
     Only one page 
-    parsed   http://ichidanv34wrx7m7.onion
+
     Full info:
  
     http://ichidanv34wrx7m7.onion
@@ -134,38 +146,49 @@ Typical request to Ichidan may looks such as
     http-title:
         Ichidan
 
+You may search by keywords (only to know what bad guys do):
 
-You may search by keywords (to only know what bad guys do):
+    gichidan -r hacking
 
-    gichidan search -r drugs
-
-    gichidan search -r guns
+    gichidan -r paypal
 
 As well as by protocol, application name or service detail:
 
-    gichidan search -r ssh
+    gichidan -r ssh
 
-    gichidan search -r irc
+    gichidan -r irc
 
-    gichidan search -r apache
+    gichidan -r apache
 
-    gichidan search -r prosody
+    gichidan -r prosody
 
-    gichidan search -r raspbian
+    gichidan -r raspbian
 
 If Ichidan can not find anything by your request, application  will display error:
 
-    gichidan search -r jdfhchgbverugbvcevcegrfvcew
+    gichidan -r jdfhchgbverugbvcevcegrfvcew
 
 Output:
     
     2013/01/20 16:12:12 Nothing found there, Neo!
 
-In current version (0.1.0) request must not contains space. In case of request such as `gichidan search -r prosody client`, only first word will be processed.
-Option with compound requests and logical operators will be implemented in future.
+In current version (0.1.0) **request must not contains spaces**. In case of request such as `gichidan search -r prosody client`, only first word will be processed. Also search by host url is not supported (in most case) by app (and Ichidan too). 
+Options with **compound requests**, **search by url** and **search with logical operators** will be implemented in future.
 
-**NOTE:** Tor Network it is not your vanilla Internet. It may be unstable or slow and there may be unexpected delays and errors. In this case you may simply restart tor service on your mashine:
+**NOTE:** Tor Network it is not your vanilla Internet. It may be unstable or slow and there may be unexpected delays and errors. In this case you may try to simply restart tor service on your mashine:
 
     sudo service tor restart
 
-**NOTE:** Ichidan it is not your vanilla Google, Yandex or Baidu. On its [page](http://ichidanv34wrx7m7.onion) you wont even find contact info or credits. In first january days of new 2018 it even was absolutely unavailable! So there is possible to recieve not any response! 
+**NOTE:** Ichidan it is not your vanilla Google, Yandex or Baidu. On its [page](http://ichidanv34wrx7m7.onion) you wont even find contact info or credits. In first january days of new 2018 it was absolutely unavailable! So there is no guarantee to recieve any response! 
+
+## TODO
+
+* Tests!!!
+* Ichidan's authorisation support
+* Search by url
+* Logical operators in requests
+* Third party tools for possible discovery of found hosts
+
+## Contributing
+
+Feel free to contribute!

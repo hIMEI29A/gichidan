@@ -22,8 +22,7 @@ import (
 )
 
 // Parser is a html and xpath parser
-type Parser struct {
-}
+type Parser struct{}
 
 // NewParser creates instance of Parser
 func NewParser() *Parser {
@@ -47,12 +46,12 @@ func getTag(node *html.Node, tagexp string) string {
 	return htmlquery.InnerText(findEntry(node, tagexp))
 }
 
-// getHref gets content of href attribute of <a> tag
+// GetHref gets content of href attribute of <a> tag
 func getHref(node *html.Node) string {
 	return htmlquery.SelectAttr(node, HREF)
 }
 
-// checkPage returns true if page is a root page and false if it is a host details page
+// CheckPage returns true if page is a root page and false if it is a host details page
 func (s *Parser) checkPage(node *html.Node) bool {
 	ch := false
 
@@ -64,7 +63,7 @@ func (s *Parser) checkPage(node *html.Node) bool {
 	return ch
 }
 
-// parseOne parses given *html.Node and creates slice of *Host
+// ParseOne parses given *html.Node and creates slice of *Host
 func (p *Parser) parseOne(node *html.Node, chanHost chan []*Host) {
 	var hosts []*Host
 	hostsNodes := p.getHosts(node)
@@ -96,7 +95,7 @@ func (p *Parser) parseOne(node *html.Node, chanHost chan []*Host) {
 	return
 }
 
-// getHostFields collects all data for Host struct creating
+// GetHostFields collects all data for Host struct creating
 // and returns it as []string
 func (p *Parser) getHostFields(node *html.Node) []string {
 	var fields []string
@@ -110,7 +109,7 @@ func (p *Parser) getHostFields(node *html.Node) []string {
 	return fields
 }
 
-// getServiceFields collects all data for Service struct creating
+// GetServiceFields collects all data for Service struct creating
 // and returns it as []string
 func (p *Parser) getServiceFields(node *html.Node) []string {
 	var fields []string
@@ -136,12 +135,12 @@ func (p *Parser) getServiceFields(node *html.Node) []string {
 	return fields
 }
 
-// getServices gets <div>'s of class "service"
+// GetServices gets <div>'s of class "service"
 func (p *Parser) getService(node *html.Node) []*html.Node {
 	return findEntrys(node, SERVICE)
 }
 
-// getHosts gets data to instantiate Host structs
+// GetHosts gets data to instantiate Host structs
 func (p *Parser) getHosts(node *html.Node) []*html.Node {
 	return findEntrys(node, HOST)
 }

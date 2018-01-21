@@ -52,7 +52,7 @@ func getHref(node *html.Node) string {
 }
 
 // CheckPage returns true if page is a root page and false if it is a host details page
-func (s *Parser) checkPage(node *html.Node) bool {
+func (p *Parser) checkPage(node *html.Node) bool {
 	ch := false
 
 	result := findEntry(node, SEARCHRESULT)

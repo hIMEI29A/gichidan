@@ -3,3 +3,5 @@ import:
 - package: github.com/hIMEI29A/gotorsocks
   version: ^0.3.1
 - package: golang.org/x/net/html
+- package: github.com/antchfx/htmlquery
+- package: github.com/antchfx/xpath

@@ -15,12 +15,18 @@
                 ░                     ░                           
 
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan) [![GoDoc](https://godoc.org/github.com/hIMEI29A/gichidan?status.svg)](http://godoc.org/github.com/hIMEI29A/gichidan)
 
 Copyright 2017 hIMEI
 
 
 ## TOC
+- [About](#about)
+- [Version](#version)
+- [Install](#install)
+- [Usage](#usage)
+- [TODO](#todo)
+- [Contributing](#contributing)
 
 1. About
 * License
@@ -68,7 +74,7 @@ Short info about Ichidan search engine from [here](https://www.cylance.com/en_us
 
 ## Version
 
-**0.1.0**
+**0.1.2**
 
 ## Install
 

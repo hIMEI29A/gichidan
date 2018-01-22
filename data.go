@@ -16,7 +16,6 @@ package main
 
 import (
 	"fmt"
-	//"time"
 )
 
 // Host struct is a basic data type

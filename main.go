@@ -35,7 +35,7 @@ var (
 	Filepath   string
 
 	// Version flag gets current app's version
-	version     = "0.1.2"
+	version     = "0.1.1"
 	versionFlag = flag.Bool("v", false, "\tprint current version")
 
 	// usage prints short help message

@@ -15,11 +15,11 @@
 /*
 Description
 
-Package gicidan is a console utility that is a wrapper for the Ichidan deep-web search engine.
+Package gichidan is a console utility that is a wrapper for the Ichidan deep-web search engine.
 The purpose of the application is to collect information about hosts in Tor Network, e.g. in .onion
 zone.
 
-Few information about Ichidan. The search engine is less like Google and more like Shodan,
+A little information about Ichidan. The search engine is less like Google and more like Shodan,
 in that it allows users to see technical information about .onion websites, including softwares names,
 services details, used protocols, connected network interfaces, such as TCP/IP ports.
 

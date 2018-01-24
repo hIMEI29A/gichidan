@@ -88,12 +88,6 @@ glide install
 go install
 ```
 
-You may **install** Gichidan also by `go install`:
-
-```sh
-go install github.com/hIMEI29A/gichidan
-```
-
 ## Usage
 
 Gichidan's CLI options are:

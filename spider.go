@@ -148,7 +148,7 @@ func (s *Spider) checkSingle(node *html.Node) bool {
 
 // Crawl is a async crawler that takes request as first argument, gets it content
 // and sends it to channel given as second argument
-func (s *Spider) Crawl(url string, channelBody chan *html.Node /*, wg *sync.WaitGroup*/) {
+func (s *Spider) Crawl(url string, channelBody chan *html.Node) {
 	chanNode := getContents(url)
 	body := <-chanNode
 

@@ -3,19 +3,20 @@
 **gichidan** - command line wrapper to 
 (warning: _onion link_) [**Ichidan**](http://ichidanv34wrx7m7.onion) deep-web search engine with enhansed pentest features (TODO).
 
-      ▄████  ██▓ ▄████▄   ██░ ██  ██░░█████▄  ▄▄▄       ███▄    █ 
-     ██▒ ▀█▒▓██▒▒██▀ ▀█  ▓██░ ██▒▓██▒▒██▀ ██▌▒████▄     ██ ▀█   █ 
-    ▒██░▄▄▄░▒██▒▒▓█    ▄ ▒██▀▀██░▒██▒░██   █▌▒██  ▀█▄  ▓██  ▀█ ██▒
-    ░▓█  ██▓░██░▒▓▓▄ ▄██▒░▓█ ░██ ░██░░▓█▄   ▌░██▄▄▄▄██ ▓██▒  ▐▌██▒
-    ░▒▓███▀▒░██░▒ ▓███▀ ░░▓█▒░██▓░██░░▒████▓  ▓█   ▓██▒▒██░   ▓██░
-     ░▒   ▒ ░▓  ░ ░▒ ▒  ░ ▒ ░░▒░▒░▓   ▒▒▓  ▒  ▒▒   ▓▒█░░ ▒░   ▒ ▒ 
-      ░   ░  ▒ ░  ░  ▒    ▒ ░▒░ ░ ▒ ░ ░ ▒  ▒   ▒   ▒▒ ░░ ░░   ░ ▒░
-    ░ ░   ░  ▒ ░░         ░  ░░ ░ ▒ ░ ░ ░  ░   ░   ▒      ░   ░ ░ 
-          ░  ░  ░ ░       ░  ░  ░ ░     ░          ░  ░         ░ 
-                ░                     ░                           
+               ███           █████       ███      █████                     
+      v1.0.0  ░░░           ░░███       ░░░      ░░███            © hIMEI
+      ███████ ████   ██████  ░███████   ████   ███████   ██████   ████████  
+     ███░░███░░███  ███░░███ ░███░░███ ░░███  ███░░███  ░░░░░███ ░░███░░███ 
+    ░███ ░███ ░███ ░███ ░░░  ░███ ░███  ░███ ░███ ░███   ███████  ░███ ░███ 
+    ░███ ░███ ░███ ░███  ███ ░███ ░███  ░███ ░███ ░███  ███░░███  ░███ ░███ 
+    ░░███████ █████░░██████  ████ █████ █████░░████████░░████████ ████ █████
+     ░░░░░███░░░░░  ░░░░░░  ░░░░ ░░░░░ ░░░░░  ░░░░░░░░  ░░░░░░░░ ░░░░ ░░░░░ 
+     ███ ░███           ___onion secrets for console cowboys___
+    ░░██████
+    ░░░░░░
 
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan) [![GoDoc](https://godoc.org/github.com/hIMEI29A/gichidan?status.svg)](http://godoc.org/github.com/hIMEI29A/gichidan)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan) [![GoDoc](https://godoc.org/github.com/hIMEI29A/gichidan?status.svg)](http://godoc.org/github.com/hIMEI29A/gichidan) [![Apache-2.0 License](https://img.shields.io/badge/license-Apache--2.0-red.svg)](LICENSE)
 
 Copyright 2017 hIMEI
 
@@ -39,7 +40,7 @@ Copyright 2017 hIMEI
 
 ##### License
 
-[![Apache-2.0 License](http://img.shields.io/badge/License-Apache-2.0-yellow.svg)](LICENSE)
+Apache-2.0 License
 
 ##### About Gichidan
 
@@ -166,14 +167,14 @@ Output:
     
     2013/01/20 16:12:12 Nothing found there, Neo!
 
-In current version (0.1.0) **request must not contains spaces**. In case of request such as `gichidan search -r prosody client`, only first word will be processed. Also search by host url is not supported (in most case) by app (and Ichidan too). 
+In current version (0.1.1) **request must not contains spaces**. In case of request such as `gichidan search -r prosody client`, only first word will be processed. Also search by host url is not supported (in most case) by app (and Ichidan too). 
 Options with **compound requests**, **search by url** and **search with logical operators** will be implemented in future.
 
 **NOTE:** Tor Network it is not your vanilla Internet. It may be unstable or slow and there may be unexpected delays and errors. In this case you may try to simply restart tor service on your mashine:
 
     sudo service tor restart
 
-**NOTE:** Ichidan it is not your vanilla Google, Yandex or Baidu. On its [page](http://ichidanv34wrx7m7.onion) you wont even find contact info or credits. In first january days of new 2018 it was absolutely unavailable! So there is no guarantee to recieve any response! 
+**NOTE:** Ichidan it is not your vanilla Google, Yandex or Baidu. On its [page](http://ichidanv34wrx7m7.onion) you wont even find contact info or credits. In first january days of new 2018 it was absolutely unavailable! So there is no guarantee to receive any response! 
 
 ## TODO
 

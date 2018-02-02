@@ -28,26 +28,26 @@ Details
 As same Ichidan is located in .onion zone too, Gichidan uses package github.com/hIMEI29A/gotorsocks
 for making requests through Tor proxy.
 
-When app recieves response from search engine, it asynchronously parses all results with Golang
+When app receives response from search engine, it asynchronously parses all results with Golang
 concurrency model, even if result's pagination contains a lot of web pages.
 
 Dependencies
 
-   	github.com/antchfx/htmlquery
-   	github.com/antchfx/xpath
-   	github.com/hIMEI29A/gotorsocks
-   	golang.org/x/net/html
+    github.com/antchfx/htmlquery
+    github.com/antchfx/xpath
+    github.com/hIMEI29A/gotorsocks
+    golang.org/x/net/html
 
 Usage
 
 Gichidan's CLI options are:
 
-   	gichidan
-       	-r <request>    search request (required)
-       	-s              short info (only hosts urls will be printed)
-       	-f <filepath>   save results to given file
-       	-v              version
-       	-h              help
+    gichidan
+        -r <request>    search request (required)
+        -s              short info (only hosts urls will be printed)
+        -f <filepath>   save results to given file
+        -v              version
+        -h              help
 
 You may search with app by keyword, by software name, by network protocol and by many others things.
 In most cases, Gichidan cannot search by url as main search engine cannot too. But you may try it.
@@ -56,37 +56,37 @@ Examples
 
 To get usage help, type in console:
 
-	gichidan -h
+  gichidan -h
 
 To get current app's version (0.1.1), try
 
-	gichidan -v
+  gichidan -v
 
 To get info about same Ichidan server, type
 
-	gichidan -r ichidan
+  gichidan -r ichidan
 
 Output:
 
     Hosts found:   1
-   	Only one page
+    Only one page
 
-   	Full info:
+    Full info:
 
-   	http://ichidanv34wrx7m7.onion
-    	2017-09-18 13:08:58 UTC
-    	tcpwrapped
-    	80
-    	tcp
-    	tcpwrapped
-    	unknown VERSION
+    http://ichidanv34wrx7m7.onion
+      2017-09-18 13:08:58 UTC
+      tcpwrapped
+      80
+      tcp
+      tcpwrapped
+      unknown VERSION
 
-   	http-headers:
+    http-headers:
 
         Server: nginx/1.10.3 (Ubuntu)
-   	    Date: Mon, 18 Sep 2017 13:08:55 GMT
+        Date: Mon, 18 Sep 2017 13:08:55 GMT
         Content-Type: text/html; charset=utf-8
-       	Connection: close
+        Connection: close
         X-Frame-Options: SAMEORIGIN
         X-XSS-Protection: 1; mode=block
         X-Content-Type-Options: nosniff
@@ -98,45 +98,45 @@ Output:
         FmU3c9PQ%3D%3D--6281f0c900799f334e5f8eb76589c89c38212d37; path=/; HttpOnly
         X-Request-Id: 1e002391-0137-41e1-83cd-acc6b69b5019
         X-Runtime: 0.005388
-   	    (Request type: HEAD)
+        (Request type: HEAD)
 
     http-server-header:
-   	    nginx/1.10.3 (Ubuntu)
+        nginx/1.10.3 (Ubuntu)
     http-title:
         Ichidan
 
 To collect info about .onion sites which have "paypal" keyword in metatags, and save it to file, try:
 
-	gichidan -r paypal -f ~/my_folder/paypal_search.txt
+  gichidan -r paypal -f ~/my_folder/paypal_search.txt
 
-You may want to know about .onion Raspbery Pi hosts with Raspbian OS?
+You may want to know about .onion Raspberry Pi hosts with Raspbian OS?
 
-	gichidan -r raspbian
+  gichidan -r raspbian
 
 There is many private XMPP(Jabber) servers in Tor network. To know about it, type in console:
 
-	gichidan -r xmpp
+  gichidan -r xmpp
 
 Or to collect info about Prosody XMPP servers only:
 
-	gichidan -r prosody
+  gichidan -r prosody
 
 If you don't want to see details info about collected servers, use -s ("short") option:
 
-	gichidan -r ssh -s
+  gichidan -r ssh -s
 
 In case of short info and output to file mode, your file will contains all details anymore
 
-	gichidan -r apache -s -f ~/my_folder/paypal_search.txt
+  gichidan -r apache -s -f ~/my_folder/paypal_search.txt
 
 Try to search by URL:
 
-	gichidan -r facebookcorewwwi.onion
+  gichidan -r facebookcorewwwi.onion
 
 Notes
 
 Tor network may be slow. In case of long delay, restart it:
 
-	sudo service tor restart
+  sudo service tor restart
 */
 package main

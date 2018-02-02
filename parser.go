@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/** file parser.go contains data types and methods for HTML content parsing */
+
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
@@ -73,9 +76,9 @@ func (p *Parser) parseOne(node *html.Node, chanHost chan []*Host) {
 		var services []*Service
 
 		detailslink := getHref(findEntry(h, DETAILS))
-		req := requestProvider(detailslink)
+		req := NewRequest(detailslink)
 
-		chanNode := getContents(req)
+		chanNode := getContents(req.RequestStrings[0])
 		dnode := <-chanNode
 
 		srvNodes := findEntrys(dnode, SERVICELONG)
@@ -106,7 +109,29 @@ func (p *Parser) getHostFields(node *html.Node) []string {
 	addDate := strings.TrimPrefix(getTag(findEntry(node, SUMMARY), SPAN), ADDED)
 	fields = append(fields, addDate)
 
+	primary := p.getPrimary(node)
+	fields = append(fields, primary)
+
 	return fields
+}
+
+// getPrimary parses PrimaryRequest field for Host struct
+func (p *Parser) getPrimary(node *html.Node) string {
+	primString := trimString(getHref(findEntry(findEntry(node, PRIMARY), LINK)))
+	fmt.Println(primString)
+	splitted := strings.Split(primString, AND)
+	fmt.Println(splitted[0])
+	primary := strings.TrimPrefix(splitted[0], SEARCH)
+	fmt.Println(primary)
+
+	return primary
+}
+
+// GetTotal gets results total number
+func (p *Parser) getTotal(root *html.Node) string {
+	total := trimString(getTag(root, TOTAL))
+
+	return total
 }
 
 // GetServiceFields collects all data for Service struct creating
@@ -114,22 +139,28 @@ func (p *Parser) getHostFields(node *html.Node) []string {
 func (p *Parser) getServiceFields(node *html.Node) []string {
 	var fields []string
 
+	// Service name
 	if findEntry(node, H3) != nil {
 		fields = append(fields, getTag(node, H3))
 	} else {
 		fields = append(fields, getTag(node, STATE))
 	}
 
+	// Service port
 	fields = append(fields, getTag(node, PORT))
+	// Service protocol
 	fields = append(fields, getTag(node, PROTO))
+	// Service state
 	fields = append(fields, getTag(node, STATE))
 
+	// Service version
 	if findEntry(node, VERSION) != nil {
 		fields = append(fields, getTag(node, VERSION))
 	} else {
 		fields = append(fields, "unknown VERSION")
 	}
 
+	// Service details, e.g. ServDetails
 	fields = append(fields, getTag(node, PRE))
 
 	return fields

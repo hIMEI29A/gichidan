@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/** file utils.go contains constants and global vars */
+
 package main
 
 import (
@@ -43,7 +45,7 @@ const (
 	SEARCH         = "/search?query="
 )
 
-// Html parsing
+// Html parsing and logic expressions
 const (
 	ADDED          string = "Added on "
 	LONGFORM              = "2017-09-09 01:30:35 UTC"
@@ -61,6 +63,8 @@ const (
 	PAGINATION            = "//div[@class='pagination']"
 	DETAILS               = "//a[@class='details']"
 	SUMMARY               = "//div[@class='search-result-summary col-xs-4']"
+	INDEXSUMMARY          = "//dev[@class='indexsummary']"
+	ROW                   = "//div[@class='raw']"
 	ONION                 = "//div[@class='onion']"
 	TOTAL                 = "//div[@class='bignumber']"
 	SERVICE               = "//div[@class='service']"
@@ -73,9 +77,38 @@ const (
 	PORT                  = "//div[@class='port']"
 	PROTO                 = "//div[@class='protocol']"
 	STATE                 = "//div[@class='state']"
+	PRIMARY               = "//div[@class='span8 name']"
 	PREVIOUS              = "← Previous"
 	NEXT                  = "Next →"
+	AND                   = "+"
+	OR                    = "||"
+	NOT                   = "-"
 )
+
+// Console messages
+const (
+	NOTHING    string = "Nothing found there, Neo!"
+	ONLYONE           = "Only one page"
+	UNKNOWN           = "unknown version"
+	WAIT              = "Waiting for connect..."
+	PROCESSING        = "in processing"
+	RECEIVED          = "Respose received"
+	NOTEXIST          = "Given path does not exist"
+	EXIST             = "File already exist, we'll not rewrite it "
+	FOUND             = "Total hosts found: "
+	BYREQ             = "by request "
+	PRESS             = "Press any key to see details"
+	FULL              = "Full info: "
+	SHORT             = "Short info"
+	SAVED             = "Saved to"
+)
+
+// LOGIC is a operators for making logic requests
+var LOGIC = []string{
+	AND,
+	OR,
+	NOT,
+}
 
 var SLEEPER = sleeper()
 
@@ -100,8 +133,7 @@ func trimString(str string) string {
 }
 
 // Sleeper is a closure which calls time.Sleep with random time
-// range between 300 and 359 milliseconds. It will be used in spider.Crawl() to avoid
-// highly load to Ichidan server.
+// range between 300 and 359 milliseconds. It used to avoid server overloading
 func sleeper() func() {
 	return func() {
 		s := rand.NewSource(time.Now().UnixNano())

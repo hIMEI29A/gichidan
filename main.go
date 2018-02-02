@@ -35,8 +35,10 @@ var (
 	Filepath   string
 
 	// Version flag gets current app's version
-	version     = "0.1.1"
+	version     = "v1.0.0"
 	versionFlag = flag.Bool("v", false, "\tprint current version")
+
+	bannerFlag = flag.Bool("b", false, "\tshow ASCII banner")
 
 	// usage prints short help message
 	usage = func() {
@@ -55,13 +57,13 @@ func toFile(filepath string, parsed []*Host) {
 	dir := path.Dir(filepath)
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		errString := BOLD + RED + "Given path does not exist" + RESET
+		errString := makeErrString(NOTEXIST)
 		newerr := errors.New(errString)
 		ErrFatal(newerr)
 	}
 
 	if _, err := os.Stat(filepath); os.IsExist(err) {
-		errString := BOLD + RED + "File already exist, we'll not rewrite it " + RESET
+		errString := makeErrString(EXIST)
 		newerr := errors.New(errString)
 		ErrFatal(newerr)
 	}
@@ -103,10 +105,9 @@ func main() {
 		Filepath = *outputFlag
 	}
 
-	request := requestProvider(*requestFlag)
-
 	var (
 		parsedHosts []*Host
+		rootHosts   = make(map[string]string)
 		mutex       = &sync.Mutex{}
 		totalHosts  = 1
 	)
@@ -124,30 +125,41 @@ func main() {
 		p = NewParser()
 	)
 
+	request := NewRequest(*requestFlag)
+
 	// Start crawling
-	go s.Crawl(request, channelBody)
+	for _, req := range request.RequestStrings {
+		go s.Crawl(req, channelBody)
+	}
+
+	if *bannerFlag {
+		banner()
+	}
+
+	fmt.Println(makeMessage(WAIT))
 
 	for len(parsedHosts) < totalHosts {
 		select {
 		case recievedNode := <-channelBody:
 			if s.checkRoot(recievedNode) == true {
-				// Get results total number
-				total := s.getTotal(recievedNode)
-				totalHosts = toInt(total)
-				fmt.Println(BOLD, YEL, "Hosts found: ", CYN, total, RESET)
+				prim := p.getPrimary(recievedNode)
+				total := p.getTotal(recievedNode)
+				rootHosts[prim] = total
+				// Get total number of all requests
+				totalHosts += toInt(total)
 			}
 
 			go s.getPagination(recievedNode, chanUrls)
 			go p.parseOne(recievedNode, chanHost)
 
 		case newUrl := <-chanUrls:
-			// Firstly check if link was visited
+			// Check if link was visited
 			mutex.Lock()
 			if s.HandledUrls[newUrl] == false {
 				go s.Crawl(newUrl, channelBody)
 				s.HandledUrls[newUrl] = true
 				SLEEPER()
-				fmt.Println(BOLD, CYN, newUrl, YEL, " in processing", RESET)
+				fmt.Println(makeValMessage(newUrl), makeMessage(PROCESSING))
 			} else {
 			}
 			mutex.Unlock()
@@ -159,23 +171,29 @@ func main() {
 		}
 	}
 
-	// Results output. If shortInfoFlag was parsed, only hosts urls will be printed.
+	fmt.Println(getTotalStats(rootHosts, totalHosts))
+
+	pressAny()
+
+	finalHosts := request.resultProvider(parsedHosts)
+
+	// Results output. If shortInfoFlag was parsed, only collected urls will be printed.
 	if !*shortInfoFlag {
-		fmt.Println(BOLD, YEL, "Full info:\n", RESET)
-		for _, m := range parsedHosts {
-			fmt.Println(BOLD, GRN, m.String(), RESET)
+		fmt.Println(makeMessage(FULL))
+		for _, m := range finalHosts {
+			fmt.Println(makeUrlMessage(m.String()))
 		}
 	} else {
-		fmt.Println(BOLD, YEL, "\nShort info:\n", RESET)
-		for _, m := range parsedHosts {
-			fmt.Println(BOLD, GRN, m.HostUrl, RESET)
+		fmt.Println(makeMessage(SHORT))
+		for _, m := range finalHosts {
+			fmt.Println(makeUrlMessage(m.HostUrl))
 		}
 	}
 
 	// Save results to file if flag parsed
 	if Filepath != "" {
-		fmt.Println(BOLD, YEL, "Saved to ", CYN, Filepath, RESET)
-		Parsed = parsedHosts
+		fmt.Println(makeMessage(SAVED))
+		Parsed = finalHosts
 		toFile(Filepath, Parsed)
 	}
 

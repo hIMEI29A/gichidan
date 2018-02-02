@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/** file spider.go contains data types and its methods for web-crawling */
+
 package main
 
 import (
@@ -19,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strings"
+	//"strings"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/hIMEI29A/gotorsocks"
@@ -41,6 +43,7 @@ func NewSpider() *Spider {
 	return spider
 }
 
+/*
 // RequestProvider creates GET request with given string
 func requestProvider(request string) string {
 	var fullRequest string
@@ -62,6 +65,7 @@ func requestProvider(request string) string {
 
 	return fullRequest
 }
+*/
 
 // ConnectProvider provides connect to Ichidan with gotorsocks package
 func connectProvider() net.Conn {
@@ -90,13 +94,6 @@ func getContents(request string) chan *html.Node {
 	}()
 
 	return chanNode
-}
-
-// GetTotal gets results total number
-func (s *Spider) getTotal(root *html.Node) string {
-	total := trimString(getTag(root, TOTAL))
-
-	return total
 }
 
 // CheckResult controls empty search results
@@ -153,7 +150,7 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node) {
 	body := <-chanNode
 
 	if s.checkResult(body) == false {
-		errString := BOLD + RED + "Nothing found there, Neo!" + RESET
+		errString := makeErrString(NOTHING)
 		err := errors.New(errString)
 		ErrFatal(err)
 	}
@@ -176,13 +173,13 @@ func (s *Spider) getPagination(node *html.Node, chanUrls chan string) {
 			if htmlquery.InnerText(newtag) != PREVIOUS &&
 				htmlquery.InnerText(newtag) != NEXT &&
 				toInt(htmlquery.InnerText(newtag)) > current {
-				link := requestProvider(getHref(newtag))
+				req := NewRequest(getHref(newtag))
 
-				chanUrls <- link
+				chanUrls <- req.RequestStrings[0]
 			}
 		}
 	} else {
-		fmt.Println(BOLD, GRN, "Only one page", RESET)
+		fmt.Println(makeMessage(ONLYONE))
 	}
 
 	return

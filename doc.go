@@ -25,11 +25,13 @@ services details, used protocols, connected network interfaces, such as TCP/IP p
 
 Details
 
-As same Ichidan is located in .onion zone too, Gichidan uses package github.com/hIMEI29A/gotorsocks
+As Ichidan is located in .onion zone too, Gichidan uses package github.com/hIMEI29A/gotorsocks
 for making requests through Tor proxy.
 
 When app receives response from search engine, it asynchronously parses all results with Golang
 concurrency model, even if result's pagination contains a lot of web pages.
+
+NEW!!! Since v1.0.0 (current) search with logical expressions is implemented. See details below.
 
 Dependencies
 
@@ -56,15 +58,15 @@ Examples
 
 To get usage help, type in console:
 
-  gichidan -h
+      gichidan -h
 
-To get current app's version (0.1.1), try
+To get current app's version number (1.0.0), try
 
-  gichidan -v
+      gichidan -v
 
 To get info about same Ichidan server, type
 
-  gichidan -r ichidan
+      gichidan -r ichidan
 
 Output:
 
@@ -107,36 +109,82 @@ Output:
 
 To collect info about .onion sites which have "paypal" keyword in metatags, and save it to file, try:
 
-  gichidan -r paypal -f ~/my_folder/paypal_search.txt
+    gichidan -r paypal -f ~/my_folder/paypal_search.txt
 
 You may want to know about .onion Raspberry Pi hosts with Raspbian OS?
 
-  gichidan -r raspbian
+    gichidan -r raspbian
 
 There is many private XMPP(Jabber) servers in Tor network. To know about it, type in console:
 
-  gichidan -r xmpp
+    gichidan -r xmpp
 
 Or to collect info about Prosody XMPP servers only:
 
-  gichidan -r prosody
+    gichidan -r prosody
+
+To run program in non-verbose ("mute") mode, use `-m` flag. GET requests messages
+will not be printed in this case:
+
+    gichidan -r accounts -m
+
+To print oldschool ASCII banner before crawling start, use `-b` flag:
+
+    gichidan -r ejabberd -b
 
 If you don't want to see all details info about collected servers, use -s ("short") option:
 
-  gichidan -r ssh -s
+    gichidan -r ssh -s
 
 In case of short info and output to file mode, your file will contains all details anymore
 
-  gichidan -r apache -s -f ~/my_folder/paypal_search.txt
+    gichidan -r apache -s -f ~/my_folder/paypal_search.txt
 
 Try to search by URL:
 
-  gichidan -r facebookcorewwwi.onion
+    gichidan -r facebookcorewwwi.onion
+
+If Ichidan can not find anything by your request, application  will display error:
+
+    gichidan -r jdfhchgbverugbvcevcegrfvcew
+
+Output:
+
+    2013/01/20 16:12:12 Nothing found there!
+
+Logical operators (NEW)
+
+Here is a simple rules for its usage:
+
+Expression MUST contain no more than two words (_yet_) with an operator between them and
+MUST NOT contain spaces between words and operator. Operators are:
+
+    AND "+"
+    NOT "-"
+    OR  "="
+
+Examples:
+
+It will show only results which satisfy "prosody" and "ejabberd" requests both:
+
+    gichidan -r prosody+ejabberd
+
+It will show only results of "paypal" request wich not satisfy "crime" request:
+
+    gichidan -r paypal-crime
+
+It will show results of "bbs" and "telnet" requests separately:
+
+    gichidan -r bbs=telnet
+
+If search engine cannot find anything by one of words, application  will display error:
+
+    gichidan -r ssh+jdfhchgbverugbvcevcegrfvcew
 
 Notes
 
-Tor network may be slow. In case of long delay, restart it:
+Tor network may be slow. In case of long delay, restart Tor:
 
-  sudo service tor restart
+    sudo service tor restart
 */
 package main

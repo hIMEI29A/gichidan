@@ -36,21 +36,15 @@ var (
 
 	// Version flag gets current app's version
 	version     = "v1.0.0"
-	versionFlag = flag.Bool("v", false, "\tprint current version")
+	versionFlag = flag.Bool("v", false, "print current version")
 
 	// Print ASCII banner for oldschool guys
-	bannerFlag = flag.Bool("b", false, "\tshow ASCII banner")
+	bannerFlag = flag.Bool("b", false, "show ASCII banner")
 
-	// usage prints short help message
-	usage = func() {
-		fmt.Println(BOLD, RED, "\t", "Usage:", RESET)
-		fmt.Println(WHT, "\t", "gichidan [<args>] [options]")
-		fmt.Println(BLU, "Args:", GRN, "\t", "-r", "\t", CYN, "your search request to Ichidan")
-		fmt.Println(BLU, "Options:\n", GRN, "\t\t")
-	}
+	// Don't print GET request's messages
+	muteFlag = flag.Bool("m", false, "Don't print GET request's messages (non-verbose output)")
 
-	// helpCmd prints usage()
-	helpCmd = flag.Bool("h", false, "\thelp message")
+	helpCmd = flag.Bool("h", false, "help message")
 )
 
 // ToFile saves results to given file
@@ -88,17 +82,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *helpCmd {
-		usage()
-	}
-
 	if len(os.Args) < 1 {
-		usage()
+		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
 	if *requestFlag == "" {
-		usage()
+		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
@@ -139,6 +129,10 @@ func main() {
 	}
 
 	fmt.Println(makeMessage(WAIT))
+	if *muteFlag {
+		SLEEPER()
+		fmt.Println(makeMessage(CONN))
+	}
 
 	for len(parsedHosts) < totalHosts {
 		select {
@@ -168,7 +162,12 @@ func main() {
 				go s.Crawl(newUrl, channelBody)
 				s.HandledUrls[newUrl] = true
 				SLEEPER()
-				fmt.Println(makeValMessage(newUrl), makeMessage(PROCESSING))
+
+				// verbose output
+				if !*muteFlag {
+					fmt.Println(makeValMessage(newUrl), makeMessage(PROCESSING))
+				}
+
 			} else {
 			}
 			mutex.Unlock()
@@ -197,7 +196,6 @@ func main() {
 		fmt.Println(makeMessage(SHORT))
 		for _, m := range finalHosts {
 			fmt.Println(makeUrlMessage(m.HostUrl))
-			fmt.Println(m.PrimaryRequest)
 		}
 	}
 

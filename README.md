@@ -1,7 +1,7 @@
 # gichidan
 
 **gichidan** - command line wrapper with enhansed pentest features for 
-(warning: _onion link_) [**Ichidan**](http://ichidanv34wrx7m7.onion) - deep-web search engine.
+(_onion link_) [**Ichidan**](http://ichidanv34wrx7m7.onion) - deep-web search engine.
 
                ███           █████       ███      █████                     
               ░░░           ░░███       ░░░      ░░███                    
@@ -60,7 +60,7 @@ Short info about Ichidan search engine from [here](https://www.cylance.com/en_us
 
 ## Features
 
-**NEW!** Since v1.0.0 (current) search with logical expressions supported.
+**NEW!** Since version 1.0.0 (current) search with logical expressions supported.
 See **Usage** section of this paper for details.
 
 ## Version
@@ -92,12 +92,15 @@ go install
 
 Gichidan's CLI options are:
 
-    gichidan
-        -r <request>    search request (required)
-        -s              short info (only hosts urls will be printed)
-        -f <filepath>   save results to given file
-        -v              version
-        -h              help
+    -b    show ASCII banner
+    -f string
+          save results to file
+    -h    help message
+    -m    Don't print GET request's messages (non-verbose output)
+    -r string
+          your search request to Ichidan
+    -s    print hosts urls only
+    -v    print current version
 
 Typical request to Ichidan looks like
 
@@ -154,9 +157,27 @@ As well as by protocol, application name or service detail:
 
     gichidan -r apache
 
+    gichidan -r tcpwrapped
+
     gichidan -r prosody
 
     gichidan -r raspbian
+
+To save results in file use flag `-f` with full file path followed:
+
+    gichidan -r telnet -f ~/my_folder/telnet_search.txt
+
+If you don't want to see all details info about collected servers, use `-s` ("short") option. In case of short info and output to file mode, your file will contains all details anymore: 
+
+    gichidan -r apache -s -f ~/my_folder/paypal_search.txt
+
+To run program in non-verbose ("mute") mode, use `-m` flag. GET requests messages will not be printed in this case:
+
+    gichidan -r accounts -m
+
+To print oldschool ASCII banner before crawling start, use `-b` flag:
+
+    gichidan -r ejabberd -b
 
 If Ichidan can not find anything by your request, application  will display error:
 
@@ -168,7 +189,8 @@ Output:
 
 ###### Logical expressions
 
-**NEW!** Since v1.0.0 (current) search with logical expressions supported. Here is a simple rules for its usage:
+**NEW!** Since version 
+v1.0.0 (current) search with logical expressions supported. Here is a simple rules for its usage:
 
 Expression MUST contain no more than two words (_yet_) with an operator between them and MUST NOT contain spaces between words and operator. Operators are:
 
@@ -176,17 +198,17 @@ Expression MUST contain no more than two words (_yet_) with an operator between 
     NOT "-"
     OR  "="
 
-Eaxamples:
+Examples:
 
-It will show only results of "prosody" and "ejabberd" requests both:
+It will show only results which satisfy "prosody" and "ejabberd" requests both:
 
     gichidan -r prosody+ejabberd
 
-It will show only results of "paypal" request wich not satisfy "crime" requests:
+It will show only results of "paypal" request wich not satisfy "crime" request:
 
     gichidan -r paypal-crime
 
-It will show results of "bbs" and "telnet "requests separately:
+It will show results of "bbs" and "telnet" requests separately:
 
     gichidan -r bbs=telnet
 
@@ -194,7 +216,7 @@ If search engine cannot find anything by one of words, application  will display
 
     gichidan -r ssh+jdfhchgbverugbvcevcegrfvcew
 
-**Request MUST NOT contain spaces**. In case of request such as `gichidan search -r prosody client`, only first word will be processed. Also search by host url is not supported (in most case) by app (and Ichidan too). 
+**Request MUST NOT contain spaces**. In case of request such as `gichidan -r prosody client`, only first word will be processed. Also search by host url is not supported (in most case) by app (and Ichidan too). 
 
 **NOTE:** Tor Network it is not your vanilla Internet. It may be unstable or slow and there may be unexpected delays and errors. In this case you may try to simply restart tor service on your mashine:
 

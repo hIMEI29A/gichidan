@@ -102,6 +102,7 @@ const (
 	SHORT             = "Short info"
 	SAVED             = "Saved to"
 	WILL              = " will be printed"
+	CONN              = "Connected"
 )
 
 // LOGIC is a operators for making logic requests

@@ -121,7 +121,7 @@ Or to collect info about Prosody XMPP servers only:
 
   gichidan -r prosody
 
-If you don't want to see details info about collected servers, use -s ("short") option:
+If you don't want to see all details info about collected servers, use -s ("short") option:
 
   gichidan -r ssh -s
 

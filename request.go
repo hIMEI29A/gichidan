@@ -17,7 +17,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -66,10 +65,12 @@ func NewRequest(req string) *Request {
 	var op string
 
 	switch {
+	// Case for program's inner logic
 	case string(req[0]) == "/":
 		reqString := "GET " + req + "\n"
 		fullRequest = append(fullRequest, reqString)
 
+	// Case for program's inner logic
 	case string(req[0]) != "/" &&
 		string(req[0]) != NONE &&
 		strings.Contains(req, NONE) == true:
@@ -78,12 +79,14 @@ func NewRequest(req string) *Request {
 		reqString := "GET " + SEARCH + splitted[0] + "\n"
 		fullRequest = append(fullRequest, reqString)
 
+	// Search with operators
 	case strings.Contains(req, AND) == true:
 		fullr, primr := makeLogicRequest(req)
 		fullRequest = fullr
 		primStrings = primr
 		op = AND
 
+	// Search with operators
 	case strings.Contains(req, OR) == true:
 		fullr, primr := makeLogicRequest(req)
 		fullRequest = fullr
@@ -91,6 +94,7 @@ func NewRequest(req string) *Request {
 
 		op = OR
 
+	// Search with operators
 	case strings.Contains(req, NOT) == true:
 		fullr, primr := makeLogicRequest(req)
 		fullRequest = fullr
@@ -98,6 +102,7 @@ func NewRequest(req string) *Request {
 
 		op = NOT
 
+	// Default is a case without search operators, e.g. "gichidan -r ichidan"
 	default:
 		reqString := "GET " + SEARCH + req + "\n"
 		fullRequest = append(fullRequest, reqString)
@@ -126,36 +131,46 @@ func (r *Request) inRange(host *Host, hosts []*Host) bool {
 }
 
 // SortResult sorts received hosts by its primary request's strings
-func (r *Request) sortResult(hosts []*Host) ([]*Host, []*Host) {
-	var (
-		hostsFirst []*Host
-		hostsSec   []*Host
-	)
+func (r *Request) splitResult(hosts []*Host) chan []*Host {
+	// Channel for output
+	chHosts := make(chan []*Host, 2)
 
-	if len(r.PrimaryStrings) > 1 {
-		for i := range hosts {
-			if hosts[i].PrimaryRequest == r.PrimaryStrings[0] {
-				hostsFirst = append(hostsFirst, hosts[i])
-			}
+	go func() {
+		var (
+			hostsFirst []*Host
+			hostsSec   []*Host
+		)
 
-			if hosts[i].PrimaryRequest == r.PrimaryStrings[1] {
-				hostsSec = append(hostsSec, hosts[i])
+		if len(r.PrimaryStrings) > 1 {
+			for i := range hosts {
+				if hosts[i].PrimaryRequest == r.PrimaryStrings[0] {
+					hostsFirst = append(hostsFirst, hosts[i])
+				}
+
+				if hosts[i].PrimaryRequest == r.PrimaryStrings[1] {
+					hostsSec = append(hostsSec, hosts[i])
+				}
 			}
 		}
-	}
-	if len(r.PrimaryStrings) == 1 {
-		hostsFirst = hosts
-	}
+		if len(r.PrimaryStrings) == 1 {
+			hostsFirst = hosts
+		}
 
-	return hostsFirst, hostsSec
+		chHosts <- hostsFirst
+		chHosts <- hostsSec
+	}()
+
+	return chHosts
 }
 
 // ResultProvider makes logical operations NOT, OR and AND against found hosts.
 func (r *Request) resultProvider(hosts []*Host) []*Host {
 	var finalHosts []*Host
 
-	hostsFirst, hostsSec := r.sortResult(hosts)
-	fmt.Println(len(hostsFirst), len(hostsSec))
+	chHosts := r.splitResult(hosts)
+	//hostsFirst, hostsSec := r.sortResult(hosts)
+	hostsFirst := <-chHosts
+	hostsSec := <-chHosts
 
 	if len(hostsSec) != 0 {
 		switch {

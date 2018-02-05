@@ -38,6 +38,7 @@ var (
 	version     = "v1.0.0"
 	versionFlag = flag.Bool("v", false, "\tprint current version")
 
+	// Print ASCII banner for oldschool guys
 	bannerFlag = flag.Bool("b", false, "\tshow ASCII banner")
 
 	// usage prints short help message
@@ -109,12 +110,13 @@ func main() {
 		parsedHosts []*Host
 		rootHosts   = make(map[string]string)
 		mutex       = &sync.Mutex{}
-		totalHosts  = 1
+		// len(parsedHosts) must be less than totalHosts at the start of crawling
+		totalHosts = 1
 	)
 
 	// Channels
 	var (
-		channelBody = make(chan *html.Node, BUFFSIZE)
+		channelBody = make(chan map[string]*html.Node, BUFFSIZE)
 		chanUrls    = make(chan string, BUFFSIZE)
 		chanHost    = make(chan []*Host, BUFFSIZE)
 	)
@@ -141,15 +143,22 @@ func main() {
 	for len(parsedHosts) < totalHosts {
 		select {
 		case recievedNode := <-channelBody:
-			if s.checkRoot(recievedNode) == true {
-				prim := p.getPrimary(recievedNode)
-				total := p.getTotal(recievedNode)
-				rootHosts[prim] = total
-				// Get total number of all requests
-				totalHosts += toInt(total)
+			primUrl, hostNode := unMap(recievedNode)
+			if s.checkRoot(hostNode) == true {
+				total := p.getTotal(hostNode)
+				rootHosts[primUrl] = total
+				// Get total number of all hosts. If here is first found root page,
+				// totalHosts value must be decremented for happy loop exiting.
+				if len(rootHosts) == 1 {
+					totalHosts += (toInt(total) - 1)
+				}
+
+				if len(rootHosts) > 1 {
+					totalHosts += toInt(total)
+				}
 			}
 
-			go s.getPagination(recievedNode, chanUrls)
+			go s.getPagination(hostNode, chanUrls)
 			go p.parseOne(recievedNode, chanHost)
 
 		case newUrl := <-chanUrls:
@@ -167,15 +176,16 @@ func main() {
 		case newhosts := <-chanHost:
 			for _, h := range newhosts {
 				parsedHosts = append(parsedHosts, h)
+
 			}
 		}
 	}
 
-	fmt.Println(getTotalStats(rootHosts, totalHosts))
+	finalHosts := request.resultProvider(parsedHosts)
+
+	fmt.Println(getTotalStats(rootHosts, finalHosts, totalHosts))
 
 	pressAny()
-
-	finalHosts := request.resultProvider(parsedHosts)
 
 	// Results output. If shortInfoFlag was parsed, only collected urls will be printed.
 	if !*shortInfoFlag {
@@ -187,6 +197,7 @@ func main() {
 		fmt.Println(makeMessage(SHORT))
 		for _, m := range finalHosts {
 			fmt.Println(makeUrlMessage(m.HostUrl))
+			fmt.Println(m.PrimaryRequest)
 		}
 	}
 

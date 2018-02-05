@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	//"strings"
 
 	"github.com/antchfx/htmlquery"
 	"github.com/hIMEI29A/gotorsocks"
@@ -42,30 +41,6 @@ func NewSpider() *Spider {
 
 	return spider
 }
-
-/*
-// RequestProvider creates GET request with given string
-func requestProvider(request string) string {
-	var fullRequest string
-
-	switch {
-	case string(request[0]) == "/":
-		fullRequest = "GET " + request + "\n"
-
-	case string(request[0]) != "/" &&
-		string(request[0]) != NONE &&
-		strings.Contains(request, NONE) == true:
-
-		splitted := strings.Split(request, NONE)
-		fullRequest = "GET " + SEARCH + splitted[0] + "\n"
-
-	default:
-		fullRequest = "GET " + SEARCH + request + "\n"
-	}
-
-	return fullRequest
-}
-*/
 
 // ConnectProvider provides connect to Ichidan with gotorsocks package
 func connectProvider() net.Conn {
@@ -110,42 +85,43 @@ func (s *Spider) checkResult(node *html.Node) bool {
 
 // CheckRoot checks if given page is first or single page
 func (s *Spider) checkRoot(node *html.Node) bool {
-	check := false
+	ch := false
 
 	if s.checkSingle(node) == false || getTag(findEntry(node, PAGINATION), CURRENT) == "1" {
-		check = true
+		ch = true
 	}
 
-	return check
+	return ch
 }
 
 // CheckDone checks last pagination's page
 func (s *Spider) checkDone(node *html.Node) bool {
-	check := false
+	ch := false
 
 	pagination := findEntry(node, PAGINATION)
 
 	if findEntry(pagination, DISABLED) != nil {
-		check = true
+		ch = true
 	}
 
-	return check
+	return ch
 }
 
 // CheckSingle checks if given page is single (have not pagination)
 func (s *Spider) checkSingle(node *html.Node) bool {
-	check := true
+	ch := true
 
 	if findEntry(node, PAGINATION) == nil {
-		check = false
+		ch = false
 	}
 
-	return check
+	return ch
 }
 
 // Crawl is a async crawler that takes request as first argument, gets it content
 // and sends it to channel given as second argument
-func (s *Spider) Crawl(url string, channelBody chan *html.Node) {
+func (s *Spider) Crawl(url string, channelBody chan map[string]*html.Node) {
+	bodyMap := make(map[string]*html.Node)
 	chanNode := getContents(url)
 	body := <-chanNode
 
@@ -155,7 +131,9 @@ func (s *Spider) Crawl(url string, channelBody chan *html.Node) {
 		ErrFatal(err)
 	}
 
-	channelBody <- body
+	bodyMap[trimString(trimUrl(url))] = body
+
+	channelBody <- bodyMap
 
 	return
 }

@@ -76,5 +76,5 @@ func (h *Host) String() string {
 		servs += s.String() + "\n"
 	}
 
-	return fmt.Sprintf("%s\n %s\n %s\n", h.HostUrl, h.AddDate, servs)
+	return fmt.Sprintf("%s\n %s\n %s\n %s\n", h.HostUrl, h.AddDate, h.PrimaryRequest, servs)
 }

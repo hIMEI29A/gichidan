@@ -17,6 +17,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -31,12 +32,20 @@ func makeLogicRequest(req string) ([]string, []string) {
 			for _, s := range splitted {
 				reqString := "GET " + SEARCH + s + "\n"
 				fullr = append(fullr, reqString)
-				primr = append(primr, s)
+				primr = append(primr, trimString(s))
 			}
 		}
 	}
 
 	return fullr, primr
+}
+
+// TrimUrl takes string as argument and cuts everything but primary request
+func trimUrl(url string) string {
+	splitted := strings.Split(url, "query")
+	primary := trimString(strings.TrimPrefix(splitted[1], "="))
+
+	return primary
 }
 
 // Request is a data type for representing requests to search engine
@@ -92,6 +101,7 @@ func NewRequest(req string) *Request {
 	default:
 		reqString := "GET " + SEARCH + req + "\n"
 		fullRequest = append(fullRequest, reqString)
+		primStrings = append(primStrings, req)
 	}
 
 	request.RequestStrings = fullRequest
@@ -101,33 +111,12 @@ func NewRequest(req string) *Request {
 	return request
 }
 
-// sortResult sorts received hosts by its primary request's strings
-func (r *Request) sortResult(hosts []*Host) map[string][]*Host {
-	hostMap := make(map[string][]*Host)
-
-	if r.PrimaryStrings != nil {
-		for _, h := range hosts {
-			if h.PrimaryRequest == r.PrimaryStrings[0] {
-				hostMap[r.PrimaryStrings[0]] = append(hostMap[r.PrimaryStrings[0]], h)
-			}
-
-			if h.PrimaryRequest == r.PrimaryStrings[1] {
-				hostMap[r.PrimaryStrings[1]] = append(hostMap[r.PrimaryStrings[1]], h)
-			}
-		}
-	} else {
-		hostMap["total"] = hosts
-	}
-
-	return hostMap
-}
-
 // InRange checks if given slice of *Host contains given Host
 func (r *Request) inRange(host *Host, hosts []*Host) bool {
 	check := false
 
-	for _, h := range hosts {
-		if host.HostUrl == h.HostUrl {
+	for i := range hosts {
+		if hosts[i].HostUrl == host.HostUrl {
 			check = true
 			break
 		}
@@ -136,37 +125,65 @@ func (r *Request) inRange(host *Host, hosts []*Host) bool {
 	return check
 }
 
+// SortResult sorts received hosts by its primary request's strings
+func (r *Request) sortResult(hosts []*Host) ([]*Host, []*Host) {
+	var (
+		hostsFirst []*Host
+		hostsSec   []*Host
+	)
+
+	if len(r.PrimaryStrings) > 1 {
+		for i := range hosts {
+			if hosts[i].PrimaryRequest == r.PrimaryStrings[0] {
+				hostsFirst = append(hostsFirst, hosts[i])
+			}
+
+			if hosts[i].PrimaryRequest == r.PrimaryStrings[1] {
+				hostsSec = append(hostsSec, hosts[i])
+			}
+		}
+	}
+	if len(r.PrimaryStrings) == 1 {
+		hostsFirst = hosts
+	}
+
+	return hostsFirst, hostsSec
+}
+
 // ResultProvider makes logical operations NOT, OR and AND against found hosts.
 func (r *Request) resultProvider(hosts []*Host) []*Host {
 	var finalHosts []*Host
 
-	hostMap := r.sortResult(hosts)
+	hostsFirst, hostsSec := r.sortResult(hosts)
+	fmt.Println(len(hostsFirst), len(hostsSec))
 
-	if hostMap[r.PrimaryStrings[0]] != nil && hostMap[r.PrimaryStrings[1]] != nil {
+	if len(hostsSec) != 0 {
 		switch {
 		case r.Operator == AND:
-			for _, h := range hostMap[r.PrimaryStrings[0]] {
-				if r.inRange(h, hostMap[r.PrimaryStrings[1]]) == true {
-					finalHosts = append(finalHosts, h)
+			for i := range hostsFirst {
+				if r.inRange(hostsFirst[i], hostsSec) == true {
+					finalHosts = append(finalHosts, hostsFirst[i])
 				}
 			}
 
 		case r.Operator == NOT:
-			for _, h := range hostMap[r.PrimaryStrings[0]] {
-				if r.inRange(h, hostMap[r.PrimaryStrings[1]]) == false {
-					finalHosts = append(finalHosts, h)
+			for i := range hostsFirst {
+				if r.inRange(hostsFirst[i], hostsSec) == false {
+					finalHosts = append(finalHosts, hostsFirst[i])
 				}
 			}
 
 		case r.Operator == OR:
-			for _, h := range hostMap[r.PrimaryStrings[0]] {
-				finalHosts = append(finalHosts, h)
+			for i := range hostsFirst {
+				finalHosts = append(finalHosts, hostsFirst[i])
 			}
 
-			for _, hh := range hostMap[r.PrimaryStrings[1]] {
-				finalHosts = append(finalHosts, hh)
+			for i := range hostsSec {
+				finalHosts = append(finalHosts, hostsSec[i])
 			}
 		}
+	} else {
+		finalHosts = hosts
 	}
 
 	return finalHosts

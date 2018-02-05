@@ -59,12 +59,11 @@ const (
 	NONE                  = " "
 	CURRENT               = "//em[@class='current']"
 	DISABLED              = "//span[@class='next_page disabled']"
-	SEARCHRESULT          = "//div[@class='search-results']"
+	SEARCHRESULT          = "//div[@id='search-results']"
 	PAGINATION            = "//div[@class='pagination']"
 	DETAILS               = "//a[@class='details']"
 	SUMMARY               = "//div[@class='search-result-summary col-xs-4']"
-	INDEXSUMMARY          = "//dev[@class='indexsummary']"
-	ROW                   = "//div[@class='raw']"
+	ROW                   = "//div[@class='row']"
 	ONION                 = "//div[@class='onion']"
 	TOTAL                 = "//div[@class='bignumber']"
 	SERVICE               = "//div[@class='service']"
@@ -81,7 +80,7 @@ const (
 	PREVIOUS              = "← Previous"
 	NEXT                  = "Next →"
 	AND                   = "+"
-	OR                    = "||"
+	OR                    = "="
 	NOT                   = "-"
 )
 
@@ -91,16 +90,18 @@ const (
 	ONLYONE           = "Only one page"
 	UNKNOWN           = "unknown version"
 	WAIT              = "Waiting for connect..."
+	PARSING           = "All data downloaded. Waiting for parsing"
 	PROCESSING        = "in processing"
 	RECEIVED          = "Respose received"
 	NOTEXIST          = "Given path does not exist"
 	EXIST             = "File already exist, we'll not rewrite it "
 	FOUND             = "Total hosts found: "
 	BYREQ             = "by request "
-	PRESS             = "Press any key to see details"
+	PRESS             = "Press Enter to see details"
 	FULL              = "Full info: "
 	SHORT             = "Short info"
 	SAVED             = "Saved to"
+	WILL              = " will be printed"
 )
 
 // LOGIC is a operators for making logic requests
@@ -118,6 +119,13 @@ func toInt(str string) int {
 	ErrFatal(err)
 
 	return intCount
+}
+
+// iToa converts int to string and handle errors
+func iToa(i int) string {
+	str := strconv.Itoa(i)
+
+	return str
 }
 
 // ErrFatal is the basic errors handler

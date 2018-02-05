@@ -21,6 +21,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 func makeErrString(errConst string) string {
@@ -43,34 +44,44 @@ func makeUrlMessage(url string) string {
 	return message
 }
 
-func getTotalStats(bloodyRoots map[string]string, total int) string {
-	stats := makeMessage(FOUND) + makeValMessage(string(total)) + "\n"
+func getTotalStats(bloodyRoots map[string]string, finalHosts []*Host, total int) string {
+	stats := makeMessage(FOUND) + makeValMessage(iToa(total)) + "\n"
 
-	for s, i := range bloodyRoots {
-		stats += makeMessage(BYREQ) + makeValMessage(s) + ": " + makeValMessage(i)
-
+	for i, s := range bloodyRoots {
+		stats += makeMessage(BYREQ) + makeValMessage(i) + ": " + makeValMessage(s) + "\n"
 	}
+
+	stats += makeValMessage(iToa(len(finalHosts))) + makeMessage(WILL)
 
 	return stats
 }
 
 func pressAny() {
 	var input string
-	fmt.Println(PRESS)
+	fmt.Println(makeMessage(PRESS))
 	fmt.Scanln(&input)
 }
 
 func banner() {
 	fmt.Println(GRN, "           ███         ", RED, "█████     ", GRN, "███    ", RED, "█████          ")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(WHT, "  v1.0.0", RED, "░░░           ░░███       ░░░      ░░███          ", WHT, "© hIMEI")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, "  ███████ ████   ██████  ░███████   ████   ███████   ██████   ████████  ")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, " ███░░███░░███  ███░░███ ░███░░███ ░░███  ███░░███  ░░░░░███ ░░███░░███ ")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, "░███ ░███ ░███ ░███ ░░░  ░███ ░███  ░███ ░███ ░███   ███████  ░███ ░███ ")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, "░███ ░███ ░███ ░███  ███ ░███ ░███  ░███ ░███ ░███  ███░░███  ░███ ░███ ")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, "░░███████ █████░░██████  ████ █████ █████░░████████░░████████ ████ █████")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, " ░░░░░███░░░░░  ░░░░░░  ░░░░ ░░░░░ ░░░░░  ░░░░░░░░  ░░░░░░░░ ░░░░ ░░░░░ ")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, " ███ ░███        ", GRN, "___onion secrets for console cowboys___")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, "░░██████")
+	time.Sleep(100 * time.Millisecond)
 	fmt.Println(RED, "░░░░░░", RESET)
-
 }

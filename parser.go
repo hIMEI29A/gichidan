@@ -17,7 +17,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
@@ -54,6 +53,19 @@ func getHref(node *html.Node) string {
 	return htmlquery.SelectAttr(node, HREF)
 }
 
+// UnMap extracts key and value from given map. Returns key's string and value's *html.Node
+func unMap(nodeMap map[string]*html.Node) (string, *html.Node) {
+	var str string
+	var node *html.Node
+
+	for key, value := range nodeMap {
+		str = key
+		node = value
+	}
+
+	return str, node
+}
+
 // CheckPage returns true if page is a root page and false if it is a host details page
 func (p *Parser) checkPage(node *html.Node) bool {
 	ch := false
@@ -67,12 +79,17 @@ func (p *Parser) checkPage(node *html.Node) bool {
 }
 
 // ParseOne parses given *html.Node and creates slice of *Host
-func (p *Parser) parseOne(node *html.Node, chanHost chan []*Host) {
+func (p *Parser) parseOne(node map[string]*html.Node, chanHost chan []*Host) {
 	var hosts []*Host
-	hostsNodes := p.getHosts(node)
+
+	url, hostNode := unMap(node)
+
+	hostsNodes := p.getHosts(hostNode)
 
 	for _, h := range hostsNodes {
 		fields := p.getHostFields(h)
+		fields = append(fields, trimString(url))
+
 		var services []*Service
 
 		detailslink := getHref(findEntry(h, DETAILS))
@@ -109,22 +126,7 @@ func (p *Parser) getHostFields(node *html.Node) []string {
 	addDate := strings.TrimPrefix(getTag(findEntry(node, SUMMARY), SPAN), ADDED)
 	fields = append(fields, addDate)
 
-	primary := p.getPrimary(node)
-	fields = append(fields, primary)
-
 	return fields
-}
-
-// getPrimary parses PrimaryRequest field for Host struct
-func (p *Parser) getPrimary(node *html.Node) string {
-	primString := trimString(getHref(findEntry(findEntry(node, PRIMARY), LINK)))
-	fmt.Println(primString)
-	splitted := strings.Split(primString, AND)
-	fmt.Println(splitted[0])
-	primary := strings.TrimPrefix(splitted[0], SEARCH)
-	fmt.Println(primary)
-
-	return primary
 }
 
 // GetTotal gets results total number

@@ -71,7 +71,16 @@ See **Usage** section of this paper for details.
 
 Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 
+###### Install standalone deb binary package
+
+**Requirements**
+
+Linux Debian/Ubuntu amd64
+
+
 ###### Install from source
+
+If you are Golang programmer, you may want to get source code and build app from it manually. Do next steps.
 
 Progect uses `glide` to manage dependencies, so install it first
 
@@ -87,6 +96,8 @@ git clone https://github.com/hIMEI29A/gichidan.git .
 glide install
 go install
 ```
+
+Done.
 
 ## Usage
 

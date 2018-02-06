@@ -23,3 +23,4 @@ $(TARGET):
 install: $(TARGET)
 	cp $(TARGET) $(BUILDDIR)
 	rm -f $(ARTEFACT)
+	rm -f $(TARGET)

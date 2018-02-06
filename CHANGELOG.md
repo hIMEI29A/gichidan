@@ -1,5 +1,25 @@
 # Changelog - gichidan
 
+### 1.0.0
+
+__Changes__
+
+- Search with logical expressions implemented
+- Deb package's install added
+- Documentation and README.md rewrited
+- Many changes in build system and inner program logic invisible to users
+
+
+
+
+__Contributors__
+
+- hIMEI
+
+Released by hIMEI, Tue 06 Feb 2018 -
+[see the diff](https://github.com/<no value>/gichidan/compare/0.1.1...1.0.0#diff)
+______________
+
 ### 0.1.1
 
 __Changes__
@@ -12,7 +32,7 @@ __Contributors__
 - hIMEI
 
 Released by hIMEI, Sun 21 Jan 2018 -
-[see the diff](https://github.com/hIMEI29A/gichidan/compare/0.1.0...0.1.1#diff)
+[see the diff](https://github.com/<no value>/gichidan/compare/0.1.0...0.1.1#diff)
 ______________
 
 ### 0.1.0
@@ -34,7 +54,7 @@ __Contributors__
 - hIMEI
 
 Released by hIMEI, Sun 21 Jan 2018 -
-[see the diff](https://github.com/hIMEI29A/gichidan/compare/e57581e8c548fee66ffbff1b7dea693ee27a7b2d...0.1.0#diff)
+[see the diff](https://github.com/<no value>/gichidan/compare/e57581e8c548fee66ffbff1b7dea693ee27a7b2d...0.1.0#diff)
 ______________
 
 

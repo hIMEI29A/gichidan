@@ -69,9 +69,24 @@ See **Usage** section of this paper for details.
 
 ## Install
 
-Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
+
+###### Install standalone deb binary package
+
+**Requirements**: Linux Debian/Ubuntu amd64
+
+Download `deb` package and install it with `dpkg` or `gdebi`:
+
+    wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.0/\
+    gichidan-1.0.0-amd64.deb && sudo dpkg -i gichidan-1.0.0-amd64.deb
+
+    wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.0/\
+    gichidan-1.0.0-amd64.deb && sudo gdebi gichidan-1.0.0-amd64.deb
+
+Using of `apt-get install` will be implemented soon. Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 
 ###### Install from source
+
+If you are Golang programmer, you may want to get source code and build app from it manually. Do next steps.
 
 Progect uses `glide` to manage dependencies, so install it first
 
@@ -87,6 +102,8 @@ git clone https://github.com/hIMEI29A/gichidan.git .
 glide install
 go install
 ```
+
+Done.
 
 ## Usage
 
@@ -233,3 +250,7 @@ If search engine cannot find anything by one of words, application  will display
 ## Contributing
 
 Feel free to contribute!
+
+#### Report a bug
+
+himei@tuta.io

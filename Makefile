@@ -1,14 +1,12 @@
-##############################################################
-# @Package gichidan                                          #
-#                                                            #
-# Makefile                                                   #
-##############################################################
+###########################################
+#          @Package gichidan              #
+#                                         #
+#              Makefile                   #
+###########################################
 
-IMPORT_PATH := github.com/hIMEI29A/gichidan
 BUILDDIR := $(CURDIR)/build/amd64/gichidan
-GITHUB_REPO := hIMEI29A/gichidan
 
-CC = go build
+CC = go build --ldflags "-X main.VERSION=1.0.0"
 TARGET = gichidan
 ARTEFACT = cliface
 

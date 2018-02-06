@@ -1,0 +1,21 @@
+  {
+  "package": "gichidan",
+  "architecture": "amd64",
+  "maintainer": "hIMEI <himei@tuta.io>",
+  "copyright": "2018 hIMEI <himei@tuta.io>",
+  "description": "Gichidan - CLI wrapper for Ichidan deep-web search engine",
+  "license": "Apache-2.0",
+  "depends": [],
+  "preDepends": [],
+  "section": "default",
+  "priority": "extra",
+  "homepage": "https://github.com/hIMEI29A/gichidan",
+  "preinst": "",
+  "postinst": "",
+  "prerm": "",
+  "postrm": "",
+  "autoPath": "deb-pkg",
+  "files": {
+    "gichidan": "/usr/local/bin/gichidan"
+  }
+}

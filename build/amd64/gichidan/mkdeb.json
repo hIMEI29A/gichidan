@@ -1,5 +1,6 @@
   {
   "package": "gichidan",
+  "name": "gichidan",
   "architecture": "amd64",
   "maintainer": "hIMEI <himei@tuta.io>",
   "copyright": "2018 hIMEI <himei@tuta.io>",
@@ -14,8 +15,5 @@
   "postinst": "",
   "prerm": "",
   "postrm": "",
-  "autoPath": "deb-pkg",
-  "files": {
-    "gichidan": "/usr/local/bin/gichidan"
-  }
+  "autoPath": "deb-pkg"
 }

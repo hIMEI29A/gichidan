@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** file utils.go contains constants and global vars */
+/** file utils.go contains constants, global vars and some helper functions*/
 
 package main
 
@@ -72,6 +72,7 @@ const (
 	SERVICEDETAILS        = "//div[@class='service-details col-sm-2']"
 	HOST                  = "//div[@class='search-result row-fluid']"
 	NORESULT              = "//div[@class='msg alert alert-info']"
+	NOAUTH                = "//div[@class='alert alert-dismissible alert-danger']"
 	RESULT                = "//div[@class='col-sm-9']"
 	PORT                  = "//div[@class='port']"
 	PROTO                 = "//div[@class='protocol']"
@@ -87,6 +88,7 @@ const (
 // Console messages
 const (
 	NOTHING    string = "Nothing found there, Neo!"
+	ERRAUTH           = "This does not work yet"
 	ONLYONE           = "Only one page"
 	UNKNOWN           = "unknown version"
 	WAIT              = "Waiting for connect..."

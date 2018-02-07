@@ -1,5 +1,23 @@
 # Changelog - gichidan
 
+### 1.0.1
+
+__Changes__
+
+- Bug with "Please login before using filters" message fixed. Now it's
+  being handled without panic
+
+
+
+
+__Contributors__
+
+- hIMEI
+
+Released by hIMEI, Wed 07 Feb 2018 -
+[see the diff](https://github.com/hIMEI29A/gichidan/compare/1.0.0...1.0.1#diff)
+______________
+
 ### 1.0.0
 
 __Changes__
@@ -17,7 +35,7 @@ __Contributors__
 - hIMEI
 
 Released by hIMEI, Tue 06 Feb 2018 -
-[see the diff](https://github.com/<no value>/gichidan/compare/0.1.1...1.0.0#diff)
+[see the diff](https://github.com/hIMEI29A/gichidan/compare/0.1.1...1.0.0#diff)
 ______________
 
 ### 0.1.1
@@ -32,7 +50,7 @@ __Contributors__
 - hIMEI
 
 Released by hIMEI, Sun 21 Jan 2018 -
-[see the diff](https://github.com/<no value>/gichidan/compare/0.1.0...0.1.1#diff)
+[see the diff](https://github.com/hIMEI29A/gichidan/compare/0.1.0...0.1.1#diff)
 ______________
 
 ### 0.1.0
@@ -54,7 +72,7 @@ __Contributors__
 - hIMEI
 
 Released by hIMEI, Sun 21 Jan 2018 -
-[see the diff](https://github.com/<no value>/gichidan/compare/e57581e8c548fee66ffbff1b7dea693ee27a7b2d...0.1.0#diff)
+[see the diff](https://github.com/hIMEI29A/gichidan/compare/e57581e8c548fee66ffbff1b7dea693ee27a7b2d...0.1.0#diff)
 ______________
 
 

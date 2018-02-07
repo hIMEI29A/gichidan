@@ -35,7 +35,7 @@ var (
 	Filepath   string
 
 	// Version flag gets current app's version
-	version     = "v1.0.0"
+	version     = "1.0.1"
 	versionFlag = flag.Bool("v", false, "print current version")
 
 	// Print ASCII banner for oldschool guys

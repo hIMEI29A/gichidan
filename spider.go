@@ -75,8 +75,19 @@ func getContents(request string) chan *html.Node {
 func (s *Spider) checkResult(node *html.Node) bool {
 	ch := true
 
-	result := findEntry(node, NORESULT)
-	if result != nil {
+	resultNoresult := findEntry(node, NORESULT)
+	if resultNoresult != nil {
+		ch = false
+	}
+
+	return ch
+}
+
+func (s *Spider) checkAuth(node *html.Node) bool {
+	ch := true
+
+	resultNoauth := findEntry(node, NOAUTH)
+	if resultNoauth != nil {
 		ch = false
 	}
 
@@ -127,6 +138,12 @@ func (s *Spider) Crawl(url string, channelBody chan map[string]*html.Node) {
 
 	if s.checkResult(body) == false {
 		errString := makeErrString(NOTHING)
+		err := errors.New(errString)
+		ErrFatal(err)
+	}
+
+	if s.checkAuth(body) == false {
+		errString := makeErrString(ERRAUTH)
 		err := errors.New(errString)
 		ErrFatal(err)
 	}

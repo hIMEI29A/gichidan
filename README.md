@@ -60,12 +60,12 @@ Short info about Ichidan search engine from [here](https://www.cylance.com/en_us
 
 ## Features
 
-**NEW!** Since version 1.0.0 (current) search with logical expressions supported.
+**NEW!** Since version 1.0.0 search with logical expressions supported.
 See **Usage** section of this paper for details.
 
 ## Version
 
-**v1.0.0**
+**v1.0.1**
 
 ## Install
 
@@ -77,20 +77,12 @@ See **Usage** section of this paper for details.
 Download `deb` package and install it with `dpkg` or `gdebi`:
 
     wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.0/\
-    gichidan-1.0.0-amd64.deb && sudo dpkg -i gichidan-1.0.0-amd64.deb
+    gichidan-1.0.0-amd64.deb && sudo dpkg -i gichidan-1.0.1-amd64.deb
 
     wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.0/\
-    gichidan-1.0.0-amd64.deb && sudo gdebi gichidan-1.0.0-amd64.deb
+    gichidan-1.0.0-amd64.deb && sudo gdebi gichidan-1.0.1-amd64.deb
 
 Using of `apt-get install` will be implemented soon. Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
-
-
-###### Install standalone deb binary package
-
-**Requirements**
-
-Linux Debian/Ubuntu amd64
-
 
 ###### Install from source
 
@@ -215,7 +207,7 @@ Output:
 ###### Logical expressions
 
 **NEW!** Since version 
-v1.0.0 (current) search with logical expressions supported. Here is a simple rules for its usage:
+v1.0.0 search with logical expressions supported. Here is a simple rules for its usage:
 
 Expression MUST contain no more than two words (_yet_) with an operator between them and MUST NOT contain spaces between words and operator. Operators are:
 

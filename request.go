@@ -84,6 +84,7 @@ func NewRequest(req string) *Request {
 		fullr, primr := makeLogicRequest(req)
 		fullRequest = fullr
 		primStrings = primr
+
 		op = AND
 
 	// Search with operators

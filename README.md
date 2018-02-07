@@ -1,6 +1,6 @@
 # gichidan
 
-**gichidan** - command line wrapper with enhansed pentest features for 
+**gichidan** - command line wrapper with enhanced pentest features for 
 (_onion link_) [**Ichidan**](http://ichidanv34wrx7m7.onion) - deep-web search engine.
 
                ███           █████       ███      █████                     

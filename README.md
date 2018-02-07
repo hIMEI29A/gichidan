@@ -77,10 +77,10 @@ See **Usage** section of this paper for details.
 Download `deb` package and install it with `dpkg` or `gdebi`:
 
     wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.0/\
-    gichidan-1.0.0-amd64.deb && sudo dpkg -i gichidan-1.0.1-amd64.deb
+    gichidan-1.0.1-amd64.deb && sudo dpkg -i gichidan-1.0.1-amd64.deb
 
     wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.0/\
-    gichidan-1.0.0-amd64.deb && sudo gdebi gichidan-1.0.1-amd64.deb
+    gichidan-1.0.1-amd64.deb && sudo gdebi gichidan-1.0.1-amd64.deb
 
 Using of `apt-get install` will be implemented soon. Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 

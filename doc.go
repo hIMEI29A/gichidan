@@ -45,11 +45,15 @@ Usage
 Gichidan's CLI options are:
 
     gichidan
-        -r <request>    search request (required)
-        -s              short info (only hosts urls will be printed)
-        -f <filepath>   save results to given file
-        -v              version
-        -h              help
+        -b    show ASCII banner
+        -f string
+              save results to file
+        -h    help message
+        -m    Don't print GET request's messages (non-verbose output)
+        -r string
+              your search request to Ichidan
+        -s    print hosts urls only
+        -v    print current version
 
 You may search with app by keyword, by software name, by network protocol and by many others things.
 In most cases, Gichidan cannot search by url as main search engine cannot too. But you may try it.

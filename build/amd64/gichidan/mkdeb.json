@@ -15,5 +15,8 @@
   "postinst": "",
   "prerm": "",
   "postrm": "",
-  "autoPath": "deb-pkg"
+  "autoPath": "deb-pkg",
+  "files": {
+    "gichidan": "/usr/local/bin/gichidan"
+  }
 }

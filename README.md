@@ -84,6 +84,13 @@ Download `deb` package and install it with `dpkg` or `gdebi`:
 
 Using of `apt-get install` will be implemented soon. Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 
+###### Install standalone deb binary package
+
+**Requirements**
+
+Linux Debian/Ubuntu amd64
+
+
 ###### Install from source
 
 If you are Golang programmer, you may want to get source code and build app from it manually. Do next steps.

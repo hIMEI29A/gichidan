@@ -34,8 +34,11 @@ var (
 	Parsed     []*Host
 	Filepath   string
 
+	// Jsoned otput
+	jsonFlag = flag.Bool("j", false, "convert output to json")
+
 	// Version flag gets current app's version
-	version     = "1.0.1"
+	version     = "1.1.1"
 	versionFlag = flag.Bool("v", false, "print current version")
 
 	// Print ASCII banner for oldschool guys
@@ -47,8 +50,8 @@ var (
 	helpCmd = flag.Bool("h", false, "help message")
 )
 
-// ToFile saves results to given file
-func toFile(filepath string, parsed []*Host) {
+// ToFile saves results to given file.
+func toFile(filepath string, toJson bool, parsed []*Host) {
 	dir := path.Dir(filepath)
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -67,9 +70,13 @@ func toFile(filepath string, parsed []*Host) {
 	ErrFatal(err)
 	defer file.Close()
 
-	for _, s := range parsed {
-		file.WriteString(s.String() + "\n\n\n")
-		ErrFatal(err)
+	for i := range parsed {
+		if toJson == false {
+			file.WriteString(parsed[i].String() + "\n\n\n")
+			ErrFatal(err)
+		} else {
+			file.Write(parsed[i].hostToJson())
+		}
 	}
 }
 
@@ -173,8 +180,8 @@ func main() {
 			mutex.Unlock()
 
 		case newhosts := <-chanHost:
-			for _, h := range newhosts {
-				parsedHosts = append(parsedHosts, h)
+			for i := range newhosts {
+				parsedHosts = append(parsedHosts, newhosts[i])
 
 			}
 		}
@@ -187,23 +194,41 @@ func main() {
 	pressAny()
 
 	// Results output. If shortInfoFlag was parsed, only collected urls will be printed.
-	if !*shortInfoFlag {
-		fmt.Println(makeMessage(FULL))
-		for _, m := range finalHosts {
-			fmt.Println(makeUrlMessage(m.String()))
+	if !*jsonFlag {
+		if !*shortInfoFlag {
+			fmt.Println(makeMessage(FULL))
+			for i := range finalHosts {
+				fmt.Println(makeUrlMessage(finalHosts[i].String()))
+			}
+		} else {
+			fmt.Println(makeMessage(SHORT))
+			for i := range finalHosts {
+				fmt.Println(makeUrlMessage(finalHosts[i].HostUrl))
+			}
 		}
 	} else {
-		fmt.Println(makeMessage(SHORT))
-		for _, m := range finalHosts {
-			fmt.Println(makeUrlMessage(m.HostUrl))
+		fmt.Println(makeMessage(FULL))
+		for i := range finalHosts {
+			os.Stdout.Write(finalHosts[i].hostToJson())
+			fmt.Println()
 		}
+	}
+
+	if *jsonFlag && *shortInfoFlag {
+		errStr := makeErrString(ERRFLAGS)
+		newerr := errors.New(errStr)
+		ErrFatal(newerr)
 	}
 
 	// Save results to file if flag parsed
 	if Filepath != "" {
-		fmt.Println(makeMessage(SAVED))
+		fmt.Println(makeMessage(SAVED), makeValMessage(Filepath))
 		Parsed = finalHosts
-		toFile(Filepath, Parsed)
+		if !*jsonFlag {
+			toFile(Filepath, false, Parsed)
+		} else {
+			toFile(Filepath, true, Parsed)
+		}
 	}
 
 }

@@ -143,29 +143,44 @@ func (p *Parser) getServiceFields(node *html.Node) []string {
 
 	// Service name
 	if findEntry(node, H3) != nil {
-		fields = append(fields, getTag(node, H3))
+		fields = append(fields, trimString(getTag(node, H3)))
 	} else {
-		fields = append(fields, getTag(node, STATE))
+		fields = append(fields, trimString(getTag(node, STATE)))
 	}
 
 	// Service port
-	fields = append(fields, getTag(node, PORT))
+	fields = append(fields, trimString(getTag(node, PORT)))
 	// Service protocol
-	fields = append(fields, getTag(node, PROTO))
+	fields = append(fields, trimString(getTag(node, PROTO)))
 	// Service state
-	fields = append(fields, getTag(node, STATE))
+	fields = append(fields, trimString(getTag(node, STATE)))
 
 	// Service version
 	if findEntry(node, VERSION) != nil {
-		fields = append(fields, getTag(node, VERSION))
+		fields = append(fields, trimString(getTag(node, VERSION)))
 	} else {
 		fields = append(fields, "unknown VERSION")
 	}
 
 	// Service details, e.g. ServDetails
-	fields = append(fields, getTag(node, PRE))
+	pre := p.getPre(node)
+	fields = append(fields, pre)
 
 	return fields
+}
+
+//GetPre gets <pre> tag's content of parsed page and trims all "\t" symbols from it.
+func (p *Parser) getPre(node *html.Node) string {
+	pre := getTag(node, PRE)
+	splitted := strings.Split(pre, "\n")
+
+	for i := range splitted {
+		splitted[i] = trimString(strings.TrimPrefix(splitted[i], "\t"))
+	}
+
+	newPre := strings.Join(splitted, "\n")
+
+	return newPre
 }
 
 // GetServices gets <div>'s of class "service"

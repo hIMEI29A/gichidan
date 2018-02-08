@@ -65,30 +65,30 @@ See **Usage** section of this paper for details.
 
 ## Version
 
-**v1.0.1**
+**v1.1.1**
 
 ## Install
 
 
-###### Install standalone deb binary package
+##### Install standalone deb binary package
 
 **Requirements**: Linux Debian/Ubuntu amd64
 
 Download `deb` package and install it with `dpkg` or `gdebi`:
 
-    wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.1/\
-    gichidan-1.0.1-amd64.deb && sudo dpkg -i gichidan-1.0.1-amd64.deb
+    wget https://github.com/hIMEI29A/gichidan/releases/download/1.1.1/\
+    gichidan-1.1.1-amd64.deb && sudo dpkg -i gichidan-1.1.1-amd64.deb
 
-    wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.1/\
-    gichidan-1.0.1-amd64.deb && sudo gdebi gichidan-1.0.1-amd64.deb
+    wget https://github.com/hIMEI29A/gichidan/releases/download/1.1.1/\
+    gichidan-1.1.1-amd64.deb && sudo gdebi gichidan-1.1.1-amd64.deb
 
 Using of `apt-get install` will be implemented soon. Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 
-###### Install from source
+##### Install from source
 
 If you are Golang programmer, you may want to get source code and build app from it manually. Do next steps.
 
-Progect uses `glide` to manage dependencies, so install it first
+Project uses `glide` to manage dependencies, so install it first
 
 ```sh
 curl https://glide.sh/get | sh
@@ -113,11 +113,13 @@ Gichidan's CLI options are:
     -f string
           save results to file
     -h    help message
+    -j    convert output to json
     -m    Don't print GET request's messages (non-verbose output)
     -r string
           your search request to Ichidan
     -s    print hosts urls only
     -v    print current version
+
 
 Typical request to Ichidan looks like
 
@@ -196,6 +198,10 @@ To print oldschool ASCII banner before crawling start, use `-b` flag:
 
     gichidan -r ejabberd -b
 
+Use `-j` flag to convert output to JSON format. This feature cannot use with `-s` flag. In case `-j` and `-s` provided both there will be error. You may also save JSON to output file with `-f` option.
+
+    gichidan -r CentOS -j -f 
+
 If Ichidan can not find anything by your request, application  will display error:
 
     gichidan -r jdfhchgbverugbvcevcegrfvcew
@@ -204,7 +210,7 @@ Output:
     
     2013/01/20 16:12:12 Nothing found there!
 
-###### Logical expressions
+#### Logical expressions
 
 **NEW!** Since version 
 v1.0.0 search with logical expressions supported. Here is a simple rules for its usage:
@@ -240,12 +246,6 @@ If search engine cannot find anything by one of words, application  will display
     sudo service tor restart
 
 **NOTE:** Ichidan it is not your vanilla Google, Yandex or Baidu. On its [page](http://ichidanv34wrx7m7.onion) you wont even find contact info or credits. In first january days of new 2018 it was absolutely unavailable! So there is no guarantee to recieve any response! 
-
-## TODO
-
-* Tests!!!
-* Ichidan's authorisation support
-* Third party tools for possible discovery of found hosts
 
 ## Contributing
 

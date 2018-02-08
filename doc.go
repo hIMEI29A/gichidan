@@ -144,6 +144,12 @@ In case of short info and output to file mode, your file will contains all detai
 
     gichidan -r apache -s -f ~/my_folder/paypal_search.txt
 
+Use `-j` flag to convert output to JSON format. This feature cannot use with `-s` flag.
+In case `-j` and `-s` provided both there will be error. You may also save JSON to
+file with `-f` option.
+
+    gichidan -r CentOS -j -f
+
 Try to search by URL:
 
     gichidan -r facebookcorewwwi.onion

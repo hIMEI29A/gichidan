@@ -9,16 +9,14 @@ CC = go build --ldflags "-X main.VERSION=1.0.1"
 TARGET = gichidan
 ARTEFACT = cliface
 
-.PHONY: all clean install	
+.PHONY: all install	
 
-all: $(TARGET) clean
-
-clean:
-	rm -f $(TARGET)
+all: $(TARGET)
 
 $(TARGET): 
 	$(CC)
 
 install: $(TARGET)
 	cp $(TARGET) $(BUILDDIR)
+	rm -f $(TARGET)
 	rm -f $(ARTEFACT)

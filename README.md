@@ -70,7 +70,7 @@ See **Usage** section of this paper for details.
 ## Install
 
 
-###### Install standalone deb binary package
+##### Install standalone deb binary package
 
 **Requirements**: Linux Debian/Ubuntu amd64
 
@@ -84,11 +84,11 @@ Download `deb` package and install it with `dpkg` or `gdebi`:
 
 Using of `apt-get install` will be implemented soon. Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 
-###### Install from source
+##### Install from source
 
 If you are Golang programmer, you may want to get source code and build app from it manually. Do next steps.
 
-Progect uses `glide` to manage dependencies, so install it first
+Project uses `glide` to manage dependencies, so install it first
 
 ```sh
 curl https://glide.sh/get | sh
@@ -204,7 +204,7 @@ Output:
     
     2013/01/20 16:12:12 Nothing found there!
 
-###### Logical expressions
+#### Logical expressions
 
 **NEW!** Since version 
 v1.0.0 search with logical expressions supported. Here is a simple rules for its usage:

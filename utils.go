@@ -43,6 +43,7 @@ const (
 const (
 	ICHIDAN string = "ichidanv34wrx7m7.onion:80"
 	SEARCH         = "/search?query="
+	AUTH           = "/users/sign_in"
 )
 
 // Html parsing and logic expressions

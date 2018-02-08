@@ -17,35 +17,36 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
 // Host struct is a basic data type
 type Host struct {
 	// HostUrl is an url of host
-	HostUrl string
+	HostUrl string `json:"hosturl"`
 	// AddDate is a date in which host was added to Ichidan index
-	AddDate string
+	AddDate string `json:"adddate"`
 	// PrimaryRequest is a request starter, e.g. search word
-	PrimaryRequest string
+	PrimaryRequest string `json:"request"`
 	// Services on host
-	Services []*Service
+	Services []*Service `json:"services"`
 }
 
 // Service contains all info about found Host
 type Service struct {
 	// Name is a service name: "OpenSSH" or "Apache httpd" for example
-	Name string
+	Name string `json:"name"`
 	// Port is a service listening port
-	Port string
+	Port string `json:"port"`
 	// Protocol is a service protocol
-	Protocol string
+	Protocol string `json:"protocol"`
 	// State is a service state: "http" or "ssh" for example
-	State string
+	State string `json:"state"`
 	// Version is a service version if parsed
-	Version string
-	// ServDetails is a parsed page <pre> tag's content
-	ServDetails string
+	Version string `json:"version"`
+	// ServDetails is a <pre> tag's content of parsed page
+	ServDetails string `json:"servdetails"`
 }
 
 // NewService is a constructor for Service struct
@@ -78,3 +79,21 @@ func (h *Host) String() string {
 
 	return fmt.Sprintf("%s\n %s\n %s\n", h.HostUrl, h.AddDate, servs)
 }
+
+// HostToJson converts output to JSON
+func (host *Host) hostToJson() []byte {
+	nosj, err := json.Marshal(host)
+	ErrFatal(err)
+
+	return nosj
+}
+
+/*
+func (host *Host) jsonToHost(jsoned []byte) *Host {
+	h := &Host{}
+	err := json.Unmarshal(jsoned, h)
+	ErrFatal(err)
+
+	return h
+}
+*/

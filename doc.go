@@ -49,6 +49,7 @@ Gichidan's CLI options are:
         -f string
               save results to file
         -h    help message
+        -j    convert output to json
         -m    Don't print GET request's messages (non-verbose output)
         -r string
               your search request to Ichidan
@@ -64,7 +65,7 @@ To get usage help, type in console:
 
       gichidan -h
 
-To get current app's version number (1.0.0), try
+To get current app's version number (1.1.1), try
 
       gichidan -v
 

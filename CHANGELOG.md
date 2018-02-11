@@ -1,5 +1,22 @@
 # Changelog - gichidan
 
+### 1.1.1
+
+__Changes__
+
+- Converting output to JSON format added.
+
+
+
+
+__Contributors__
+
+- hIMEI
+
+Released by hIMEI, Sat 10 Feb 2018 -
+[see the diff](https://github.com/hIMEI29A/gichidan/compare/1.0.1...1.1.1#diff)
+______________
+
 ### 1.0.1
 
 __Changes__

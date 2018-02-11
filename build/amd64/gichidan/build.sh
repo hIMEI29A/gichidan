@@ -11,15 +11,8 @@
 # Prints usage message end exit
 usage()
 {
-   echo "Usage : build.sh -v|--version [VERSION] -k|--key [KEY]" 
+   echo "Usage : build.sh -v|--version [VERSION]" 
 }
-
-# Uploads .deb to BinTray
-#upload()
-# {
-#    curl -v -X PUT -T "$1" -uhimei29a:"$2" "https://api.bintray.com/content/himei29a/deb/gichidan/"$3"/pool/main/$1;deb_distribution=jessie;deb_component=main;deb_architecture=amd64;publish=1"
-#}
-#
 
 # Variables 
 ########################
@@ -44,13 +37,7 @@ while [ "$1" != "" ]; do
         VERSION="$2"
         shift
         shift
-        echo "$VERSION"
-        ;;
-        -k | --key )
-        KEY="$2"
-        shift
-        shift
-        echo "$KEY"
+        echo "Version = $VERSION"
         ;;
         * )
         usage
@@ -64,12 +51,3 @@ done
 mkdeb build -version="$VERSION" mkdeb.json
 rm "$REMOVE"
 echo "Binary removed"
-
-# Upload package 
-#######################
-#
-#for f in $FILE
-#do
-#    echo "Deb package $f found"
-#    upload "$f" "$KEY" "$VERSION"
-#done

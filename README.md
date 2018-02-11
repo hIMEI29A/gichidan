@@ -120,7 +120,6 @@ Gichidan's CLI options are:
     -s    print hosts urls only
     -v    print current version
 
-
 Typical request to Ichidan looks like
 
     gichidan -r ichidan

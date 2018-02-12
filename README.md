@@ -187,7 +187,7 @@ To save results in file use flag `-f` with full file path followed:
 
 If you don't want to see all details info about collected servers, use `-s` ("short") option. In case of short info and output to file mode, your file will contains all details anymore: 
 
-    gichidan -r apache -s -f ~/my_folder/paypal_search.txt
+    gichidan -r apache -s -f ~/my_folder/apache_search.txt
 
 To run program in non-verbose ("mute") mode, use `-m` flag. GET requests messages will not be printed in this case:
 

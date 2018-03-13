@@ -38,7 +38,7 @@ var (
 	jsonFlag = flag.Bool("j", false, "convert output to json")
 
 	// Version flag gets current app's version
-	version     = "1.0.1"
+	version     = "1.1.1"
 	versionFlag = flag.Bool("v", false, "print current version")
 	/*
 		// Flag to provide credentials for authentification
@@ -214,7 +214,14 @@ func main() {
 		fmt.Println(makeMessage(FULL))
 		for i := range finalHosts {
 			os.Stdout.Write(finalHosts[i].hostToJson())
+			fmt.Println()
 		}
+	}
+
+	if *jsonFlag && *shortInfoFlag {
+		errStr := makeErrString(ERRFLAGS)
+		newerr := errors.New(errStr)
+		ErrFatal(newerr)
 	}
 
 	// Save results to file if flag parsed

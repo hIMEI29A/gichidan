@@ -5,7 +5,7 @@
 
 BUILDDIR := $(CURDIR)/build/amd64/gichidan
 
-CC = go build --ldflags "-X main.VERSION=1.0.1"
+CC = go build --ldflags "-X main.VERSION=1.1.1"
 TARGET = gichidan
 ARTEFACT = cliface
 

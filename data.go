@@ -87,13 +87,3 @@ func (host *Host) hostToJson() []byte {
 
 	return nosj
 }
-
-/*
-func (host *Host) jsonToHost(jsoned []byte) *Host {
-	h := &Host{}
-	err := json.Unmarshal(jsoned, h)
-	ErrFatal(err)
-
-	return h
-}
-*/

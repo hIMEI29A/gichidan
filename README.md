@@ -15,7 +15,7 @@
     ░░██████
     ░░░░░░
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan) [![GoDoc](https://godoc.org/github.com/hIMEI29A/gichidan?status.svg)](http://godoc.org/github.com/hIMEI29A/gichidan) [![Apache-2.0 License](https://img.shields.io/badge/license-Apache--2.0-red.svg)](LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hIMEI29A/gichidan)](https://goreportcard.com/report/github.com/hIMEI29A/gichidan) [![GoDoc](https://godoc.org/github.com/hIMEI29A/gichidan?status.svg)](http://godoc.org/github.com/hIMEI29A/gichidan) [![Apache-2.0 License](https://img.shields.io/badge/license-Apache--2.0-red.svg)](LICENSE) 
 
 Copyright 2017 hIMEI
 
@@ -65,7 +65,7 @@ See **Usage** section of this paper for details.
 
 ## Version
 
-**v1.0.1**
+**v1.1.1**
 
 ## Install
 
@@ -76,11 +76,11 @@ See **Usage** section of this paper for details.
 
 Download `deb` package and install it with `dpkg` or `gdebi`:
 
-    wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.1/\
-    gichidan-1.0.1-amd64.deb && sudo dpkg -i gichidan-1.0.1-amd64.deb
+    wget https://github.com/hIMEI29A/gichidan/releases/download/1.1.1/\
+    gichidan-1.1.1-amd64.deb && sudo dpkg -i gichidan-1.1.1-amd64.deb
 
-    wget https://github.com/hIMEI29A/gichidan/releases/download/1.0.1/\
-    gichidan-1.0.1-amd64.deb && sudo gdebi gichidan-1.0.1-amd64.deb
+    wget https://github.com/hIMEI29A/gichidan/releases/download/1.1.1/\
+    gichidan-1.1.1-amd64.deb && sudo gdebi gichidan-1.1.1-amd64.deb
 
 Using of `apt-get install` will be implemented soon. Check the [release page](https://github.com/hIMEI29A/gichidan/releases)!
 
@@ -113,6 +113,7 @@ Gichidan's CLI options are:
     -f string
           save results to file
     -h    help message
+    -j    convert output to json
     -m    Don't print GET request's messages (non-verbose output)
     -r string
           your search request to Ichidan
@@ -186,7 +187,7 @@ To save results in file use flag `-f` with full file path followed:
 
 If you don't want to see all details info about collected servers, use `-s` ("short") option. In case of short info and output to file mode, your file will contains all details anymore: 
 
-    gichidan -r apache -s -f ~/my_folder/paypal_search.txt
+    gichidan -r apache -s -f ~/my_folder/apache_search.txt
 
 To run program in non-verbose ("mute") mode, use `-m` flag. GET requests messages will not be printed in this case:
 
@@ -195,6 +196,10 @@ To run program in non-verbose ("mute") mode, use `-m` flag. GET requests message
 To print oldschool ASCII banner before crawling start, use `-b` flag:
 
     gichidan -r ejabberd -b
+
+Use `-j` flag to convert output to JSON format. This feature cannot use with `-s` flag. In case `-j` and `-s` provided both there will be error. You may also save JSON to output file with `-f` option.
+
+    gichidan -r CentOS -j -f 
 
 If Ichidan can not find anything by your request, application  will display error:
 
@@ -240,12 +245,6 @@ If search engine cannot find anything by one of words, application  will display
     sudo service tor restart
 
 **NOTE:** Ichidan it is not your vanilla Google, Yandex or Baidu. On its [page](http://ichidanv34wrx7m7.onion) you wont even find contact info or credits. In first january days of new 2018 it was absolutely unavailable! So there is no guarantee to recieve any response! 
-
-## TODO
-
-* Tests!!!
-* Ichidan's authorisation support
-* Third party tools for possible discovery of found hosts
 
 ## Contributing
 

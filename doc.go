@@ -31,7 +31,7 @@ for making requests through Tor proxy.
 When app receives response from search engine, it asynchronously parses all results with Golang
 concurrency model, even if result's pagination contains a lot of web pages.
 
-NEW!!! Since v1.0.0 (current) search with logical expressions is implemented. See details below.
+Since v1.0.0 search with logical expressions is implemented. See details below.
 
 Dependencies
 
@@ -49,6 +49,7 @@ Gichidan's CLI options are:
         -f string
               save results to file
         -h    help message
+        -j    convert output to json
         -m    Don't print GET request's messages (non-verbose output)
         -r string
               your search request to Ichidan
@@ -64,7 +65,7 @@ To get usage help, type in console:
 
       gichidan -h
 
-To get current app's version number (1.0.0), try
+To get current app's version number (1.1.1), try
 
       gichidan -v
 
@@ -143,6 +144,12 @@ If you don't want to see all details info about collected servers, use -s ("shor
 In case of short info and output to file mode, your file will contains all details anymore
 
     gichidan -r apache -s -f ~/my_folder/paypal_search.txt
+
+Use `-j` flag to convert output to JSON format. This feature cannot use with `-s` flag.
+In case `-j` and `-s` provided both there will be error. You may also save JSON to
+file with `-f` option.
+
+    gichidan -r CentOS -j -f
 
 Try to search by URL:
 

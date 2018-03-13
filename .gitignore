@@ -58,7 +58,6 @@ main
 /resources
 /build/amd64/gichidan/*.deb
 /build/amd64/gichidan/gichidan
-/build/amd64/gichidan/build.sh
 README.e.md
 change.log
 build.sh

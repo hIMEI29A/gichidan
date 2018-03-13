@@ -65,7 +65,7 @@ func pressAny() {
 func banner() {
 	fmt.Println(GRN, "           ███         ", CYN, "█████     ", GRN, "███    ", CYN, "█████          ")
 	time.Sleep(100 * time.Millisecond)
-	fmt.Println(WHT, "  v1.0.0", CYN, "░░░           ░░███       ░░░      ░░███          ", WHT, "© hIMEI")
+	fmt.Println(WHT, "  v1.1.1", CYN, "░░░           ░░███       ░░░      ░░███          ", WHT, "© hIMEI")
 	time.Sleep(100 * time.Millisecond)
 	fmt.Println(CYN, "  ███████ ████   ██████  ░███████   ████   ███████   ██████   ████████  ")
 	time.Sleep(100 * time.Millisecond)

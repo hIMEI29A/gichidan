@@ -90,6 +90,7 @@ const (
 const (
 	NOTHING    string = "Nothing found there, Neo!"
 	ERRAUTH           = "This does not work yet"
+	ERRFLAGS          = "These flags cannot be used together"
 	ONLYONE           = "Only one page"
 	UNKNOWN           = "unknown version"
 	WAIT              = "Waiting for connect..."

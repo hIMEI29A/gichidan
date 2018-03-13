@@ -88,14 +88,18 @@ func main() {
 	// Cli options parsing
 	flag.Parse()
 
+	if len(os.Args) == 1 {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
 	if *versionFlag {
 		fmt.Println(version)
 		os.Exit(1)
 	}
 
-	if len(os.Args) < 1 {
-		flag.PrintDefaults()
-		os.Exit(1)
+	if *bannerFlag {
+		banner()
 	}
 
 	if *requestFlag == "" {
@@ -133,10 +137,6 @@ func main() {
 	// Start crawling
 	for _, req := range request.RequestStrings {
 		go s.Crawl(req, channelBody)
-	}
-
-	if *bannerFlag {
-		banner()
 	}
 
 	fmt.Println(makeMessage(WAIT))

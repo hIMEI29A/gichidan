@@ -40,11 +40,7 @@ var (
 	// Version flag gets current app's version
 	version     = "1.1.1"
 	versionFlag = flag.Bool("v", false, "print current version")
-	/*
-		// Flag to provide credentials for authentification
-		authFlag   = flag.String("A", "", "credentials string in form USER:PASSWORD")
-		AuthString string
-	*/
+
 	// Print ASCII banner for oldschool guys
 	bannerFlag = flag.Bool("b", false, "show ASCII banner")
 

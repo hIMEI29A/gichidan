@@ -31,6 +31,8 @@ Copyright 2017 hIMEI
 
 ## About
 
+**21.04.2018 UPD** Ichidan is dead last 3 month, so **Gichidan is deaprecated** :(
+
 Forget about Tor Browser. Parse onion hosts from your console with **Gichidan** now.
 
 ##### License
